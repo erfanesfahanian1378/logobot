@@ -115,21 +115,34 @@ bot.on('message', async (msg) => {
     }
 
     if (text === 'بیا خیال پردازی کنیم(عکست رو تولید کن)') {
-        console.log(userState.lastText);
+
         // isRequestingMovie = true;
         userStates.set(chatId, {...userState, isRequestingImage: true});
         let message = "سلام رفیق اینجا پروتیین لند قسمت هنر های تجسمیه بهم بگو تو ذهنت چی میگذره تا من بکشمش هر چی دوست داری برات میکشم از طراحی نمای یک ویلا بگیر تا هر چیز عجیب و غریبی که دوسش داشته باشی ولی یادت باشه باید خیلی دقیق برام توصیفش کنی";
        await bot.sendMessage(chatId, message);
     } else if (userState.isRequestingImage) {
+        console.log(userState.lastText);
         try {
           await  bot.sendMessage(chatId, "پیام شما برای هنرمند سرزمین پروتیین ارسال شد کمی منتظر بمانید تا کارش تمام شود و عکس را برای شما یفرستد");
 
             const response = await axios.post('http://localhost:3000/dall', {
-                prompt : text,
+                prompt : userState.lastText + text,
                 username : username
             });
            await bot.sendMessage(chatId, `پاسخ هنر مند پروتیین به شما:  ${response.data}`);
-          await  sendCustomMessage(bot, chatId);
+
+            bot.sendMessage(chatId, "اگر میخواهید توضیحاتی به عکس فعلی اضافه کنید تا هنرمند پروتیین لند برای شما تغییرش دهد دکمه ادامه توضیحات رو بزنید", {
+                reply_markup: {
+                    keyboard: [
+                        [{text: 'ادامه توضیحات'}],
+                        [{text: 'منو اصلی'}],
+                    ],
+                    resize_keyboard: true,
+                    one_time_keyboard: true
+                }
+            });
+
+
         } catch (error) {
             console.error('Error sending data to server:', error);
            await bot.sendMessage( chatId, 'خطا در ارسال پیام.');
@@ -137,7 +150,13 @@ bot.on('message', async (msg) => {
         }
         userStates.set(chatId, {...userState, isRequestingImage: false , lastText : text });
 
-    } else {
+    } else if(text === 'منو اصلی') {
+        userStates.set(chatId, {...userState , lastText : "" });
+        await  sendCustomMessage(bot, chatId);
+    } else if(text === 'ادامه توضیحات') {
+        await bot.sendMessage( chatId, 'ادامه توضیحات رو بنویسید.');
+        userStates.set(chatId, {...userState, isRequestingImage: true });
+    }else {
         // sendCustomMessage(bot, chatId);
     }
 });
