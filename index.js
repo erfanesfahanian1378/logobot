@@ -20,7 +20,7 @@ bot.on('message', async (msg) => {
             isRequestingRecharge: false,
             isCompletingProfile: false,
             isInvitingFriend: false,
-            lastText : ""
+            lastText: ""
         };
         userStates.set(chatId, userState);
     }
@@ -67,7 +67,7 @@ bot.on('message', async (msg) => {
             }
 
             const welcomeMessage = `سلام, ${msg.from.first_name}! به ربات عکس ساز خوش آمدید `;
-           await sendCustomMessage(bot, chatId);
+            await sendCustomMessage(bot, chatId);
         }
         userStates.set(chatId, {
             isRequestingImage: false,
@@ -97,8 +97,8 @@ bot.on('message', async (msg) => {
             }
 
             const welcomeMessage = `سلام, ${msg.from.first_name}! به ربات عکس ساز خوش آمدید `;
-          await  bot.sendMessage(chatId, welcomeMessage);
-          await  sendCustomMessage(bot, chatId);
+            await bot.sendMessage(chatId, welcomeMessage);
+            await sendCustomMessage(bot, chatId);
 
 
         } else {
@@ -115,23 +115,36 @@ bot.on('message', async (msg) => {
     }
 
     if (text === 'بیا خیال پردازی کنیم(عکست رو تولید کن)') {
+        let isMember = await checkChannelMembership(chatId, msg.from.id);
+        if (!isMember) {
+            bot.sendMessage(chatId, `لطفا ابتدا عضو کانال ${channelUsername} شوید.`, {
+                reply_markup: {
+                    keyboard: [
+                        [{text: 'عضو شدم'}]
+                    ],
+                    resize_keyboard: true,
+                    one_time_keyboard: true
+                }
+            });
+        } else {
+            userStates.set(chatId, {...userState, isRequestingImage: true});
+            let message = "سلام رفیق اینجا پروتیین لند قسمت هنر های تجسمیه بهم بگو تو ذهنت چی میگذره تا من بکشمش هر چی دوست داری برات میکشم از طراحی نمای یک ویلا بگیر تا هر چیز عجیب و غریبی که دوسش داشته باشی ولی یادت باشه باید خیلی دقیق برام توصیفش کنی";
+            await bot.sendMessage(chatId, message);
+        }
 
-        // isRequestingMovie = true;
-        userStates.set(chatId, {...userState, isRequestingImage: true});
-        let message = "سلام رفیق اینجا پروتیین لند قسمت هنر های تجسمیه بهم بگو تو ذهنت چی میگذره تا من بکشمش هر چی دوست داری برات میکشم از طراحی نمای یک ویلا بگیر تا هر چیز عجیب و غریبی که دوسش داشته باشی ولی یادت باشه باید خیلی دقیق برام توصیفش کنی";
-       await bot.sendMessage(chatId, message);
+
     } else if (userState.isRequestingImage) {
         console.log(userState.lastText);
         try {
-          await  bot.sendMessage(chatId, "پیام شما برای هنرمند سرزمین پروتیین ارسال شد کمی منتظر بمانید تا کارش تمام شود و عکس را برای شما یفرستد");
+            await bot.sendMessage(chatId, "پیام شما برای هنرمند سرزمین پروتیین ارسال شد کمی منتظر بمانید تا کارش تمام شود و عکس را برای شما یفرستد");
 
             const response = await axios.post('http://localhost:3000/dall', {
-                prompt : userState.lastText + text,
-                username : username
+                prompt: userState.lastText + text,
+                username: username
             });
-           await bot.sendMessage(chatId, `پاسخ هنر مند پروتیین به شما:  ${response.data}`);
-
-            let forwardMessage = `درخواست کاربران به هنرمند پروتیین: ${userState.lastText + text}\nجواب هنرمندمون: ${response.data}`;
+            await bot.sendMessage(chatId, `پاسخ هنر مند پروتیین به شما:  ${response.data}`);
+            let describe = userState.lastText + "" + text
+            let forwardMessage = `درخواست کاربران به هنرمند پروتیین: ${describe}\nجواب هنرمندمون: ${response.data}`;
             await bot.sendMessage(channelUsername, forwardMessage);
             bot.sendMessage(chatId, "اگر میخواهید توضیحاتی به عکس فعلی اضافه کنید تا هنرمند پروتیین لند برای شما تغییرش دهد دکمه ادامه توضیحات رو بزنید", {
                 reply_markup: {
@@ -147,18 +160,18 @@ bot.on('message', async (msg) => {
 
         } catch (error) {
             console.error('Error sending data to server:', error);
-           await bot.sendMessage( chatId, 'خطا در ارسال پیام.');
-          await  bot.sendMessage( chatId, error.response.data.error);
+            await bot.sendMessage(chatId, 'خطا در ارسال پیام.');
+            await bot.sendMessage(chatId, error.response.data.error);
         }
-        userStates.set(chatId, {...userState, isRequestingImage: false , lastText : text });
+        userStates.set(chatId, {...userState, isRequestingImage: false, lastText: text});
 
-    } else if(text === 'منو اصلی') {
-        userStates.set(chatId, {...userState , lastText : "" });
-        await  sendCustomMessage(bot, chatId);
-    } else if(text === 'ادامه توضیحات') {
-        await bot.sendMessage( chatId, 'ادامه توضیحات رو بنویسید.');
-        userStates.set(chatId, {...userState, isRequestingImage: true });
-    }else {
+    } else if (text === 'منو اصلی') {
+        userStates.set(chatId, {...userState, lastText: ""});
+        await sendCustomMessage(bot, chatId);
+    } else if (text === 'ادامه توضیحات') {
+        await bot.sendMessage(chatId, 'ادامه توضیحات رو بنویسید.');
+        userStates.set(chatId, {...userState, isRequestingImage: true});
+    } else {
         // sendCustomMessage(bot, chatId);
     }
 });
@@ -170,7 +183,7 @@ bot.on('message', async (msg) => {
 // }
 
 async function sendCustomMessage(bot, chatId) {
-   await bot.sendMessage(chatId, "با معرفی ما به دوستان خود از ما حمایت کنید .", {
+    await bot.sendMessage(chatId, "با معرفی ما به دوستان خود از ما حمایت کنید .", {
         reply_markup: {
             keyboard: [
                 [{text: 'بیا خیال پردازی کنیم(عکست رو تولید کن)'}],
@@ -182,7 +195,6 @@ async function sendCustomMessage(bot, chatId) {
         }
     });
 }
-
 
 
 bot.on('callback_query', async (callbackQuery) => {
