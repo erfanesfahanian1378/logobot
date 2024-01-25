@@ -1,7 +1,5 @@
 const TelegramBot = require('node-telegram-bot-api');
 const axios = require('axios');
-
-// Replace 'YOUR_TELEGRAM_BOT_TOKEN' with the actual token from BotFather
 const token = '6439788591:AAHSXV8yBfR6pBoL9cVj1Hb3qZgqDNLDYNM';
 const bot = new TelegramBot(token, {polling: true});
 let ifItsJoined = false;
@@ -21,8 +19,8 @@ bot.on('message', async (msg) => {
             isRequestingImage: false,
             isRequestingRecharge: false,
             isCompletingProfile: false,
-            isInvitingFriend: false
-            // any other initial state properties
+            isInvitingFriend: false,
+            lastText : ""
         };
         userStates.set(chatId, userState);
     }
@@ -117,6 +115,7 @@ bot.on('message', async (msg) => {
     }
 
     if (text === 'بیا خیال پردازی کنیم(عکست رو تولید کن)') {
+        console.log(userState.lastText);
         // isRequestingMovie = true;
         userStates.set(chatId, {...userState, isRequestingImage: true});
         let message = "سلام رفیق اینجا پروتیین لند قسمت هنر های تجسمیه بهم بگو تو ذهنت چی میگذره تا من بکشمش هر چی دوست داری برات میکشم از طراحی نمای یک ویلا بگیر تا هر چیز عجیب و غریبی که دوسش داشته باشی ولی یادت باشه باید خیلی دقیق برام توصیفش کنی";
@@ -129,9 +128,6 @@ bot.on('message', async (msg) => {
                 prompt : text,
                 username : username
             });
-
-            // Send the response from the server back to the user
-            // bot.sendMessage(chatId, 'پیام شما برای موتور جست و جو گر فیلم ارسال شد. لطفا کمی صبور باشید.');
            await bot.sendMessage(chatId, `پاسخ هنر مند پروتیین به شما:  ${response.data}`);
           await  sendCustomMessage(bot, chatId);
         } catch (error) {
@@ -139,7 +135,7 @@ bot.on('message', async (msg) => {
            await bot.sendMessage( chatId, 'خطا در ارسال پیام.');
           await  bot.sendMessage( chatId, error.response.data.error);
         }
-        userStates.set(chatId, {...userState, isRequestingImage: false});
+        userStates.set(chatId, {...userState, isRequestingImage: false , lastText : text });
 
     } else {
         // sendCustomMessage(bot, chatId);
