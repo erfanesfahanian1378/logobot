@@ -160,8 +160,8 @@ bot.on('message', async (msg) => {
 
         } catch (error) {
             console.error('Error sending data to server:', error);
-            await bot.sendMessage(chatId, 'خطا در ارسال پیام.');
-            await bot.sendMessage(chatId, error.response.data.error);
+            await bot.sendMessage(chatId, 'خطا در ارسال پیام. سقف مجاز استفاده شما از ربات تمام شده باید شارژ کنید ');
+            // await bot.sendMessage(chatId, error.response.data.error);
         }
         userStates.set(chatId, {...userState, isRequestingImage: false, lastText: text});
 
