@@ -69,17 +69,7 @@ bot.on('message', async (msg) => {
             }
 
             const welcomeMessage = `سلام, ${msg.from.first_name}! به ربات عکس ساز خوش آمدید `;
-            bot.sendMessage(chatId, "با معرفی ما به دوستان خود از ما حمایت کنید .", {
-                reply_markup: {
-                    keyboard: [
-                        [{text: 'بیا خیال پردازی کنیم(عکست رو تولید کن)'}],
-                        [{text: 'پروفایلت رو تکمیل کن'}],
-                        [{text: 'شارژ کردن حساب کاربری یا دعوت از دوستان'}],
-                    ],
-                    resize_keyboard: true,
-                    one_time_keyboard: true
-                }
-            });
+           await sendCustomMessage(bot, chatId);
         }
         userStates.set(chatId, {
             isRequestingImage: false,
@@ -92,7 +82,6 @@ bot.on('message', async (msg) => {
         // Check if the user is a member of the channel
         let isMember = await checkChannelMembership(chatId, msg.from.id);
         if (isMember) {
-            bot.sendMessage(chatId, 'شما عضو کانال هستید. خوش آمدید!');
 
             try {
                 await axios.post('http://localhost:3000/start', {
@@ -110,17 +99,8 @@ bot.on('message', async (msg) => {
             }
 
             const welcomeMessage = `سلام, ${msg.from.first_name}! به ربات عکس ساز خوش آمدید `;
-            bot.sendMessage(chatId, "با معرفی ما به دوستان خود از ما حمایت کنید .", {
-                reply_markup: {
-                    keyboard: [
-                        [{text: 'بیا خیال پردازی کنیم(عکست رو تولید کن)'}],
-                        [{text: 'پروفایلت رو تکمیل کن'}],
-                        [{text: 'شارژ کردن حساب کاربری یا دعوت از دوستان'}],
-                    ],
-                    resize_keyboard: true,
-                    one_time_keyboard: true
-                }
-            });
+          await  bot.sendMessage(chatId, welcomeMessage);
+          await  sendCustomMessage(bot, chatId);
 
 
         } else {
@@ -139,17 +119,54 @@ bot.on('message', async (msg) => {
     if (text === 'بیا خیال پردازی کنیم(عکست رو تولید کن)') {
         // isRequestingMovie = true;
         userStates.set(chatId, {...userState, isRequestingImage: true});
-        let message = "";
-
-        bot.sendMessage(chatId, message);
-        bot.sendMessage(chatId, 'لطفا توضیحات فیلم مورد نظر خود را یا قسمتی از ان که به یاد دارید به صورت خلاصه وارد کنید:');
+        let message = "سلام رفیق اینجا پروتیین لند قسمت هنر های تجسمیه بهم بگو تو ذهنت چی میگذره تا من بکشمش هر چی دوست داری برات میکشم از طراحی نمای یک ویلا بگیر تا هر چیز عجیب و غریبی که دوسش داشته باشی ولی یادت باشه باید خیلی دقیق برام توصیفش کنی";
+       await bot.sendMessage(chatId, message);
     } else if (userState.isRequestingImage) {
+        try {
+          await  bot.sendMessage(chatId, "پیام شما برای هنرمند سرزمین پروتیین ارسال شد کمی منتظر بمانید تا کارش تمام شود و عکس را برای شما یفرستد");
 
+            const response = await axios.post('http://localhost:3000/dall', {
+                prompt : text,
+                username : username
+            });
+
+            // Send the response from the server back to the user
+            // bot.sendMessage(chatId, 'پیام شما برای موتور جست و جو گر فیلم ارسال شد. لطفا کمی صبور باشید.');
+           await bot.sendMessage(chatId, `پاسخ هنر مند پروتیین به شما:  ${response.data}`);
+          await  sendCustomMessage(bot, chatId);
+        } catch (error) {
+            console.error('Error sending data to server:', error);
+           await bot.sendMessage( chatId, 'خطا در ارسال پیام.');
+          await  bot.sendMessage( chatId, error.response.data.error);
+        }
+        userStates.set(chatId, {...userState, isRequestingImage: false});
 
     } else {
-        // bot.sendMessage(chatId, 'انتخاب شما :  ' + text);
+        // sendCustomMessage(bot, chatId);
     }
 });
+
+
+//  async function sendCustomMessageWithText( chatId , message) {
+//      // bot.sendMessage()
+//   await  bot.sendMessage(chatId, message);
+// }
+
+async function sendCustomMessage(bot, chatId) {
+   await bot.sendMessage(chatId, "با معرفی ما به دوستان خود از ما حمایت کنید .", {
+        reply_markup: {
+            keyboard: [
+                [{text: 'بیا خیال پردازی کنیم(عکست رو تولید کن)'}],
+                [{text: 'پروفایلت رو تکمیل کن'}],
+                [{text: 'شارژ کردن حساب کاربری یا دعوت از دوستان'}]
+            ],
+            resize_keyboard: true,
+            one_time_keyboard: true
+        }
+    });
+}
+
+
 
 bot.on('callback_query', async (callbackQuery) => {
     const gender = callbackQuery.data;
