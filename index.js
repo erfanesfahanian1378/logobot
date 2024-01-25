@@ -131,6 +131,8 @@ bot.on('message', async (msg) => {
             });
            await bot.sendMessage(chatId, `پاسخ هنر مند پروتیین به شما:  ${response.data}`);
 
+            let forwardMessage = `درخواست کاربران به هنرمند پروتیین: ${userState.lastText + text}\nجواب هنرمندمون: ${response.data}`;
+            await bot.sendMessage(channelUsername, forwardMessage);
             bot.sendMessage(chatId, "اگر میخواهید توضیحاتی به عکس فعلی اضافه کنید تا هنرمند پروتیین لند برای شما تغییرش دهد دکمه ادامه توضیحات رو بزنید", {
                 reply_markup: {
                     keyboard: [
