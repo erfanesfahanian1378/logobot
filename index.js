@@ -161,6 +161,7 @@ bot.on('message', async (msg) => {
         } catch (error) {
             console.error('Error sending data to server:', error);
             await bot.sendMessage(chatId, 'خطا در ارسال پیام. سقف مجاز استفاده شما از ربات تمام شده باید شارژ کنید ');
+            await sendCustomMessage(bot, chatId);
             // await bot.sendMessage(chatId, error.response.data.error);
         }
         userStates.set(chatId, {...userState, isRequestingImage: false, lastText: text});
@@ -171,24 +172,51 @@ bot.on('message', async (msg) => {
     } else if (text === 'ادامه توضیحات') {
         await bot.sendMessage(chatId, 'ادامه توضیحات رو بنویسید.');
         userStates.set(chatId, {...userState, isRequestingImage: true});
+    } else if (text === 'حساب کاربری شما در سرزمین پروتیین') {
+        // localhost:3000/messages?userName=Nothingtoexplaintoyou
+        let textProfile = "";
+        try {
+            const url = 'http://localhost:3000/messages?userName=' + encodeURIComponent(username);
+            const response = await axios.get(url);
+            console.log(response.data[0]);
+            textProfile = textProfile + "سلام پروتيینی عزیز چطوری خوش میگذره ؟ میبینم که حسابی داری از هنرمند سرزمین پروتیین کار میکشی امیدوارم از بقیه ربات های سرزمین پروتیین هم به خوبی استفاده کنی "
+            textProfile = textProfile + " " + response.data[0].name + ' عزیز';
+            textProfile = textProfile + "\n" + "وضعیت اشتراک های شما در سرزمین پروتیین"
+            textProfile = textProfile + "\n" + " تعداد دفعات مجاز برای استفاده از ربات عکس ساز🌉 : " + response.data[0].tokenDallE + " بار"
+            textProfile = textProfile + "\n" + " تعداد دفعات مجاز برای استفاده از ربات فیلم یاب🎥 : " + response.data[0].tokenFilmYab + " بار"
+            textProfile = textProfile + "\n" + " تعداد دفعات مجاز برای استفاده از ربات ریاضی دان🎒 : " + response.data[0].tokenMath + " بار"
+            textProfile = textProfile + "\n" + " تعداد دفعات مجاز برای استفاده از ربات نویسنده و مترجم🖋 : " + response.data[0].tokenTextGenerator + " بار"
+            textProfile = textProfile + "\n" + " تعداد دفعات مجاز برای استفاده از ربات دکتر و ازمایش خوان💉 : " + response.data[0].tokenBloodTest + " بار"
+            textProfile = textProfile + "\n" + "موجودی حساب کاربری شما💰💸 :" + response.data[0].universalWallet + " تومان"
+            textProfile = textProfile + "\n" + "حالا اگه بخوای میتونی یا تک به تک برای هر کدوم از ربات ها اشتراک ماهانه بخری یا این که حساب کاربریت رو شارژ کنی تا هر موقع به هر رباتی نیاز داشتی و تعداد دفعات استفاده رایگانت تمام شده بود از موجودی حساب کاربریت استفاده کنی."
+            await bot.sendMessage(chatId, textProfile, {
+                reply_markup: {
+                    keyboard: [
+                        [{text: 'شارژ کردن کل حساب یا شارژ روبات لگو ساز'}],
+                        [{text: 'استفاده مجدد از روبات با دعوت از دوستان'}],
+                        [{text: 'مشاهده تعرفه ها'}],
+                    ],
+                    resize_keyboard: true,
+                    one_time_keyboard: true
+                }
+            });
+        } catch (error) {
+            console.error('Error fetching data:', error);
+            await bot.sendMessage(chatId, 'خطا پیش آمده ');
+        }
+    } else if (text === 'استفاده مجدد از روبات با دعوت از دوستان') {
+        console.log("it is working");
     } else {
-        // sendCustomMessage(bot, chatId);
     }
 });
-
-
-//  async function sendCustomMessageWithText( chatId , message) {
-//      // bot.sendMessage()
-//   await  bot.sendMessage(chatId, message);
-// }
 
 async function sendCustomMessage(bot, chatId) {
     await bot.sendMessage(chatId, "با معرفی ما به دوستان خود از ما حمایت کنید .", {
         reply_markup: {
             keyboard: [
                 [{text: 'بیا خیال پردازی کنیم(عکست رو تولید کن)'}],
-                [{text: 'پروفایلت رو تکمیل کن'}],
-                [{text: 'شارژ کردن حساب کاربری یا دعوت از دوستان'}]
+                [{text: 'حساب کاربری شما در سرزمین پروتیین'}],
+                [{text: 'درباره ما'}]
             ],
             resize_keyboard: true,
             one_time_keyboard: true
