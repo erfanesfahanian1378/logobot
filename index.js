@@ -46,8 +46,10 @@ bot.on('message', async (msg) => {
                 console.error('Error sending data to server:', error);
             }
         }
+        console.log("its before is member");
         let isMember = await checkChannelMembership(chatId, msg.from.id);
         if (!isMember) {
+            console.log("should be here");
             try {
                 await axios.post('http://localhost:3000/start', {
                     username: username,
@@ -70,6 +72,7 @@ bot.on('message', async (msg) => {
                 }
             });
         } else {
+            console.log("is it in else ?");
             try {
                 await axios.post('http://localhost:3000/start', {
                     username: username,
@@ -228,11 +231,25 @@ bot.on('message', async (msg) => {
             await bot.sendMessage(chatId, 'خطا پیش آمده ');
         }
     } else if (text === 'استفاده مجدد از روبات با دعوت از دوستان') {
-        bot.sendMessage(chatId, 'پروتیینی عزیز باید حداقل ۵ نفر از دوستانت را با استفاده از لینک زیر به ربات ما دعوت کنی  تا خودت بتونی ۳ تا پیام به ربات داشته باشی');
-        const referralLink = `https://t.me/AiImageLogoCreator_bot?start=${msg.from.id}`;
-        // Send the referral link with the message in Persian
-        bot.sendMessage(chatId, `از دوستانت دعوت کن: ${referralLink}`);
-        console.log("it is working");
+        let inviteCompletedOrNot = false;
+        try {
+            await axios.get('http://localhost:3000/invite?idChat=' + msg.from.id);
+            inviteCompletedOrNot = true;
+            console.log("checkCompleted");
+        } catch (error) {
+            console.log("WEEEEEEEEEEEEEEEE");
+            console.error('Error sending data to server:', error);
+        }
+        if (inviteCompletedOrNot) {
+            bot.sendMessage(chatId, "به حساب شما ۳ بار دسترسی به ربات لوگو ساز اضافه شد");
+            sendCustomMessage(bot, chatId);
+        } else {
+            bot.sendMessage(chatId, 'پروتیینی عزیز باید حداقل ۵ نفر از دوستانت را با استفاده از لینک زیر به ربات ما دعوت کنی  تا خودت بتونی ۳ تا پیام به ربات داشته باشی');
+            const referralLink = `https://t.me/AiImageLogoCreator_bot?start=${msg.from.id}`;
+            // Send the referral link with the message in Persian
+            bot.sendMessage(chatId, `از دوستانت دعوت کن: ${referralLink}`);
+            sendCustomMessage(bot, chatId);
+        }
     } else {
     }
 });
