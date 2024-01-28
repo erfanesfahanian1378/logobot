@@ -5,14 +5,30 @@ const bot = new TelegramBot(token, {polling: true});
 let ifItsJoined = false;
 const userStates = new Map();
 const channelUsername = '@imaginAi';
-
-
+const messageChargeOption1 = "شارژ کردن کل حساب یا شارژ ربات لگو ساز";
+const messageChargeByInvite = 'استفاده مجدد از روبات با دعوت از دوستان';
+const waitingMessage = "پیام شما برای هنرمند سرزمین پروتیین ارسال شد کمی منتظر بمانید تا کارش تمام شود و عکس را برای شما یفرستد"
+const addToCurrentImage = "اگر میخواهید توضیحاتی به عکس فعلی اضافه کنید تا هنرمند پروتیین لند برای شما تغییرش دهد دکمه ادامه توضیحات رو بزنید"
+let introduction = "معرفی کوردرا: تصور کنید در دنیایی زندگی می کنید که با یک جمله ساده دنیایی از تخیلات خود را به تصویر می کشید. کوردرا بر پایه آخرین مدل های DALL.E دقیقا این امکان را برای شما فراهم میکند. 🌌✨ فقط کافیست یک توضیح متنی را به آن بدهید وناگهان شاهد خلق تصاویری از دنیاهای فانتزی و موجودات اسرار آمیز گرفته تا طراحی های مدرن و مناظر دل انگیز خواهید بود که از دل کلمات شما بیرون می آید. 🎨🖼 هر آنچه در ذهن دارید کوردرا می تواند آن را به تصویر تبدیل کند و به این ترتیب، شما را به جادوگری در عرصه خلق تصاویر تبدیل می کند. 🧙‍♂️🔮"+ "\n" + "🔥" + "توجه کنید که برای رسیدن به نتیجه دلخواهتان باید به بهترین شکل ممکن و با بیشترین جزییات تصویر مد نظرتان را توصیف کنید تا هنرمند ما بتواند هر چه در ذهن شما میگذرد پیاده سازی کند" + "🔥";
+const joined = 'عضو شدم';
+let mainMenu = 'منو اصلی';
+let inviteAlert = 'کوردرایی عزیز باید حداقل ۵ نفر از دوستانت را با استفاده از لینک زیر به ربات ما دعوت کنی ';
+let successInvite = "به حساب شما دسترسی مجدد به ربات کوردرا داده شد";
+let makeImaginationReal = 'خیال پردازی هایت را به تصویر بکش';
+let userProfile = 'حساب کاربری شما در سرزمین پروتیین';
+let aboutUs = 'درباره ما';
+let promoteUs = "با معرفی ما به دوستان خود از ما حمایت کنید .";
+let continueExplainingOption = 'ادامه توضیحات';
+let continueExplain = 'ادامه توضیحات رو بنویسید.';
+let needDeCharge = 'خطا در ارسال پیام. سقف مجاز استفاده شما از ربات تمام شده باید شارژ کنید ';
+let error = 'مشکلی پیش آمده است.';
 bot.on('message', async (msg) => {
     const chatId = msg.chat.id;
     const text = msg.text;
     let name = msg.from.first_name + "";
     let surName = msg.from.last_name + "";
     let username = msg.from.username;
+    let welcomeMessage = "درود بر " + name + " 👋 " + " به خانواده پروتئین خوش آمدی، جایی که همراه با کنجکاوی و خلاقیت شما به فراتر از محدودیت های ممکن میرویم😎. بیایید با هم این سفر هیجان انگیز را به دنیای هوش مصنوعی اغاز کنیم.";
     let userState = userStates.get(chatId);
     if (!userState) {
         userState = {
@@ -65,7 +81,7 @@ bot.on('message', async (msg) => {
             bot.sendMessage(chatId, `لطفا ابتدا عضو کانال ${channelUsername} شوید.`, {
                 reply_markup: {
                     keyboard: [
-                        [{text: 'عضو شدم'}]
+                        [{text: joined}]
                     ],
                     resize_keyboard: true,
                     one_time_keyboard: true
@@ -83,13 +99,11 @@ bot.on('message', async (msg) => {
                     logoChannel: true,
                     idChat: msg.from.id
                 });
-                await bot.sendMessage(chatId, "خوش آمدید" + name + 'حالا تو یکی از اعضا تیم پروتیینی');
+                await bot.sendMessage(chatId, welcomeMessage);
             } catch (error) {
                 console.error('Error sending data to server:', error);
-                await bot.sendMessage(chatId, 'مشکلی پیش آمده است.');
+                await bot.sendMessage(chatId, error);
             }
-
-            const welcomeMessage = `سلام, ${msg.from.first_name}! به ربات عکس ساز خوش آمدید `;
             await sendCustomMessage(bot, chatId);
         }
         userStates.set(chatId, {
@@ -99,7 +113,7 @@ bot.on('message', async (msg) => {
             isInvitingFriend: false
         });
 
-    } else if (text === 'عضو شدم') {
+    } else if (text === joined) {
         console.log("this is id " + msg.from.id);
         // Check if the user is a member of the channel
         let isMember = await checkChannelMembership(chatId, msg.from.id);
@@ -115,13 +129,12 @@ bot.on('message', async (msg) => {
                     logoChannel: true,
                     idChat: msg.from.id
                 });
-                await bot.sendMessage(chatId, "خوش آمدید" + name + 'حالا تو یکی از اعضا تیم پروتیینی');
+                await bot.sendMessage(chatId, welcomeMessage);
             } catch (error) {
                 console.error('Error sending data to server:', error);
-                await bot.sendMessage(chatId, 'مشکلی پیش آمده است.');
+                await bot.sendMessage(chatId, error);
             }
 
-            const welcomeMessage = `سلام, ${msg.from.first_name}! به ربات عکس ساز خوش آمدید `;
             await bot.sendMessage(chatId, welcomeMessage);
             await sendCustomMessage(bot, chatId);
 
@@ -130,7 +143,7 @@ bot.on('message', async (msg) => {
             bot.sendMessage(chatId, `لطفا ابتدا عضو کانال ${channelUsername} شوید.`, {
                 reply_markup: {
                     keyboard: [
-                        [{text: 'عضو شدم'}]
+                        [{text: joined}]
                     ],
                     resize_keyboard: true,
                     one_time_keyboard: true
@@ -139,14 +152,14 @@ bot.on('message', async (msg) => {
         }
     }
 
-    if (text === 'بیا خیال پردازی کنیم(عکست رو تولید کن)') {
+    if (text === makeImaginationReal) {
         console.log("this is id " + msg.from.id);
         let isMember = await checkChannelMembership(chatId, msg.from.id);
         if (!isMember) {
             bot.sendMessage(chatId, `لطفا ابتدا عضو کانال ${channelUsername} شوید.`, {
                 reply_markup: {
                     keyboard: [
-                        [{text: 'عضو شدم'}]
+                        [{text: joined}]
                     ],
                     resize_keyboard: true,
                     one_time_keyboard: true
@@ -154,15 +167,14 @@ bot.on('message', async (msg) => {
             });
         } else {
             userStates.set(chatId, {...userState, isRequestingImage: true});
-            let message = "سلام رفیق اینجا پروتیین لند قسمت هنر های تجسمیه بهم بگو تو ذهنت چی میگذره تا من بکشمش هر چی دوست داری برات میکشم از طراحی نمای یک ویلا بگیر تا هر چیز عجیب و غریبی که دوسش داشته باشی ولی یادت باشه باید خیلی دقیق برام توصیفش کنی";
-            await bot.sendMessage(chatId, message);
+            await bot.sendMessage(chatId, introduction);
         }
 
 
     } else if (userState.isRequestingImage) {
         console.log(userState.lastText);
         try {
-            await bot.sendMessage(chatId, "پیام شما برای هنرمند سرزمین پروتیین ارسال شد کمی منتظر بمانید تا کارش تمام شود و عکس را برای شما یفرستد");
+            await bot.sendMessage(chatId, waitingMessage);
 
             const response = await axios.post('http://localhost:3000/dall', {
                 prompt: userState.lastText + text,
@@ -172,11 +184,11 @@ bot.on('message', async (msg) => {
             let describe = userState.lastText + "" + text
             let forwardMessage = `درخواست کاربران به هنرمند پروتیین: ${describe}\nجواب هنرمندمون: ${response.data}`;
             await bot.sendMessage(channelUsername, forwardMessage);
-            bot.sendMessage(chatId, "اگر میخواهید توضیحاتی به عکس فعلی اضافه کنید تا هنرمند پروتیین لند برای شما تغییرش دهد دکمه ادامه توضیحات رو بزنید", {
+            bot.sendMessage(chatId, addToCurrentImage, {
                 reply_markup: {
                     keyboard: [
-                        [{text: 'ادامه توضیحات'}],
-                        [{text: 'منو اصلی'}],
+                        [{text: continueExplainingOption}],
+                        [{text: mainMenu}],
                     ],
                     resize_keyboard: true,
                     one_time_keyboard: true
@@ -186,19 +198,29 @@ bot.on('message', async (msg) => {
 
         } catch (error) {
             console.error('Error sending data to server:', error);
-            await bot.sendMessage(chatId, 'خطا در ارسال پیام. سقف مجاز استفاده شما از ربات تمام شده باید شارژ کنید ');
-            await sendCustomMessage(bot, chatId);
+            await bot.sendMessage(chatId, needDeCharge, {
+                reply_markup: {
+                    keyboard: [
+                        [{text: messageChargeOption1}],
+                        [{text: messageChargeByInvite}],
+                        [{text: mainMenu}],
+                    ],
+                    resize_keyboard: true,
+                    one_time_keyboard: true
+                }
+            });
+            // await sendCustomMessage(bot, chatId);
             // await bot.sendMessage(chatId, error.response.data.error);
         }
         userStates.set(chatId, {...userState, isRequestingImage: false, lastText: text});
 
-    } else if (text === 'منو اصلی') {
+    } else if (text === mainMenu) {
         userStates.set(chatId, {...userState, lastText: ""});
         await sendCustomMessage(bot, chatId);
-    } else if (text === 'ادامه توضیحات') {
-        await bot.sendMessage(chatId, 'ادامه توضیحات رو بنویسید.');
+    } else if (text === continueExplainingOption) {
+        await bot.sendMessage(chatId, continueExplain);
         userStates.set(chatId, {...userState, isRequestingImage: true});
-    } else if (text === 'حساب کاربری شما در سرزمین پروتیین') {
+    } else if (text === userProfile) {
         // localhost:3000/messages?userName=Nothingtoexplaintoyou
         let textProfile = "";
         try {
@@ -218,9 +240,9 @@ bot.on('message', async (msg) => {
             await bot.sendMessage(chatId, textProfile, {
                 reply_markup: {
                     keyboard: [
-                        [{text: 'شارژ کردن کل حساب یا شارژ روبات لگو ساز'}],
-                        [{text: 'استفاده مجدد از روبات با دعوت از دوستان'}],
-                        [{text: 'مشاهده تعرفه ها'}],
+                        [{text: messageChargeOption1}],
+                        [{text: messageChargeByInvite}],
+                        [{text: mainMenu}],
                     ],
                     resize_keyboard: true,
                     one_time_keyboard: true
@@ -230,7 +252,7 @@ bot.on('message', async (msg) => {
             console.error('Error fetching data:', error);
             await bot.sendMessage(chatId, 'خطا پیش آمده ');
         }
-    } else if (text === 'استفاده مجدد از روبات با دعوت از دوستان') {
+    } else if (text === messageChargeByInvite) {
         let inviteCompletedOrNot = false;
         try {
             await axios.get('http://localhost:3000/invite?idChat=' + msg.from.id);
@@ -241,10 +263,10 @@ bot.on('message', async (msg) => {
             console.error('Error sending data to server:', error);
         }
         if (inviteCompletedOrNot) {
-            bot.sendMessage(chatId, "به حساب شما ۳ بار دسترسی به ربات لوگو ساز اضافه شد");
+            bot.sendMessage(chatId, successInvite);
             sendCustomMessage(bot, chatId);
         } else {
-            bot.sendMessage(chatId, 'پروتیینی عزیز باید حداقل ۵ نفر از دوستانت را با استفاده از لینک زیر به ربات ما دعوت کنی  تا خودت بتونی ۳ تا پیام به ربات داشته باشی');
+            bot.sendMessage(chatId, inviteAlert);
             const referralLink = `https://t.me/AiImageLogoCreator_bot?start=${msg.from.id}`;
             // Send the referral link with the message in Persian
             bot.sendMessage(chatId, `از دوستانت دعوت کن: ${referralLink}`);
@@ -255,12 +277,12 @@ bot.on('message', async (msg) => {
 });
 
 async function sendCustomMessage(bot, chatId) {
-    await bot.sendMessage(chatId, "با معرفی ما به دوستان خود از ما حمایت کنید .", {
+    await bot.sendMessage(chatId, promoteUs, {
         reply_markup: {
             keyboard: [
-                [{text: 'بیا خیال پردازی کنیم(عکست رو تولید کن)'}],
-                [{text: 'حساب کاربری شما در سرزمین پروتیین'}],
-                [{text: 'درباره ما'}]
+                [{text: makeImaginationReal}],
+                [{text: userProfile}],
+                [{text: aboutUs}]
             ],
             resize_keyboard: true,
             one_time_keyboard: true
