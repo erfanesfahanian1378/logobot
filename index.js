@@ -5,11 +5,12 @@ const bot = new TelegramBot(token, {polling: true});
 let ifItsJoined = false;
 const userStates = new Map();
 const channelUsername = '@imaginAi';
-const messageChargeOption1 = "شارژ کردن کل حساب یا شارژ ربات لگو ساز";
+const channelUsername2 = '@ProteinTeam';
+const messageChargeOption1 = "شارژ کردن اکانت کوردرا. یا شارژ حساب کاربری";
 const messageChargeByInvite = 'استفاده مجدد از روبات با دعوت از دوستان';
 const waitingMessage = "پیام شما برای هنرمند سرزمین پروتیین ارسال شد کمی منتظر بمانید تا کارش تمام شود و عکس را برای شما یفرستد"
 const addToCurrentImage = "اگر میخواهید توضیحاتی به عکس فعلی اضافه کنید تا هنرمند پروتیین لند برای شما تغییرش دهد دکمه ادامه توضیحات رو بزنید"
-let introduction = "معرفی کوردرا: تصور کنید در دنیایی زندگی می کنید که با یک جمله ساده دنیایی از تخیلات خود را به تصویر می کشید. کوردرا بر پایه آخرین مدل های DALL.E دقیقا این امکان را برای شما فراهم میکند. 🌌✨ فقط کافیست یک توضیح متنی را به آن بدهید وناگهان شاهد خلق تصاویری از دنیاهای فانتزی و موجودات اسرار آمیز گرفته تا طراحی های مدرن و مناظر دل انگیز خواهید بود که از دل کلمات شما بیرون می آید. 🎨🖼 هر آنچه در ذهن دارید کوردرا می تواند آن را به تصویر تبدیل کند و به این ترتیب، شما را به جادوگری در عرصه خلق تصاویر تبدیل می کند. 🧙‍♂️🔮"+ "\n" + "🔥" + "توجه کنید که برای رسیدن به نتیجه دلخواهتان باید به بهترین شکل ممکن و با بیشترین جزییات تصویر مد نظرتان را توصیف کنید تا هنرمند ما بتواند هر چه در ذهن شما میگذرد پیاده سازی کند" + "🔥";
+let introduction = "معرفی کوردرا: تصور کنید در دنیایی زندگی می کنید که با یک جمله ساده دنیایی از تخیلات خود را به تصویر می کشید. کوردرا بر پایه آخرین مدل های DALL.E دقیقا این امکان را برای شما فراهم میکند. 🌌✨ فقط کافیست یک توضیح متنی را به آن بدهید وناگهان شاهد خلق تصاویری از دنیاهای فانتزی و موجودات اسرار آمیز گرفته تا طراحی های مدرن و مناظر دل انگیز خواهید بود که از دل کلمات شما بیرون می آید. 🎨🖼 هر آنچه در ذهن دارید کوردرا می تواند آن را به تصویر تبدیل کند و به این ترتیب، شما را به جادوگری در عرصه خلق تصاویر تبدیل می کند. 🧙‍♂️🔮" + "\n" + "🔥" + "توجه کنید که برای رسیدن به نتیجه دلخواهتان باید به بهترین شکل ممکن و با بیشترین جزییات تصویر مد نظرتان را توصیف کنید تا هنرمند ما بتواند هر چه در ذهن شما میگذرد پیاده سازی کند" + "🔥";
 const joined = 'عضو شدم';
 let mainMenu = 'منو اصلی';
 let inviteAlert = 'کوردرایی عزیز باید حداقل ۵ نفر از دوستانت را با استفاده از لینک زیر به ربات ما دعوت کنی ';
@@ -17,11 +18,15 @@ let successInvite = "به حساب شما دسترسی مجدد به ربات ک
 let makeImaginationReal = 'خیال پردازی هایت را به تصویر بکش';
 let userProfile = 'حساب کاربری شما در سرزمین پروتیین';
 let aboutUs = 'درباره ما';
+let aboutUsText = 'متن درباره ما';
 let promoteUs = "با معرفی ما به دوستان خود از ما حمایت کنید .";
 let continueExplainingOption = 'ادامه توضیحات';
 let continueExplain = 'ادامه توضیحات رو بنویسید.';
 let needDeCharge = 'خطا در ارسال پیام. سقف مجاز استفاده شما از ربات تمام شده باید شارژ کنید ';
 let error = 'مشکلی پیش آمده است.';
+let plansMessage = "شما میتوانید برا ربات کوردرا از بین ۳ پلن زیر انتخاب کنید" + "\n" + "1️⃣ ۱۰ بار تولید تصویر کیفیت ۱۰۲۴ *‌۱۰۲۴      ۴۹۰۰۰ تومان" + "\n" + "2️⃣ ۵۰ بار تولید تصویر کیفیت ۱۰۲۴ *‌۱۰۲۴      ۱۱۹۰۰۰ تومان" + "\n" + "3️⃣ ۱۲۰ بار تولید تصویر به همراه کیفیت ۲۰۴۸ *‌۲۰۴۸ برای تصاویر      ۳۰۰۰۰۰ تومان" + "\n" + "⚠️متاسفانه درگاه پرداخت ریالی ما هنوز فعال نمیباشد ولی با پرداخت هزینه به شماره کارت مدنظر در کمتر از ۴۰ دقیقه اکانت شما شارژ خواهد شد⚠️" + "\n" + "۵۰۵۴ ۱۶۱۰ ۱۳۹۴ ۱۲۳۶" + "  عرفان اصفهانیان";
+let introductionPayment = "شما میتوانید به صورت کلی اکانت خود را شارژ کنید که بتوانید از آن در تمامی ربات های ما که به زودی تا ۱۵ اسفند لانچ میشوند استفاده کنید یا این که فقط اشتراکی برای اکانت کوردرا خود بگیرید یا از دوستان خود دعوت کنید تا بتوانید اشتراک رایگان دریافت کنید"
+let channelJoin = `لطفا ابتدا عضو کانال‌های ${channelUsername} و ${channelUsername2} شوید.`;
 bot.on('message', async (msg) => {
     const chatId = msg.chat.id;
     const text = msg.text;
@@ -64,7 +69,8 @@ bot.on('message', async (msg) => {
         }
         console.log("its before is member");
         let isMember = await checkChannelMembership(chatId, msg.from.id);
-        if (!isMember) {
+        let isMember2 = await checkChannelMembership2(chatId, msg.from.id);
+        if (!(isMember && isMember2)) {
             console.log("should be here");
             try {
                 await axios.post('http://localhost:3000/start', {
@@ -78,7 +84,7 @@ bot.on('message', async (msg) => {
             } catch (error) {
                 console.error('Error sending data to server:', error);
             }
-            bot.sendMessage(chatId, `لطفا ابتدا عضو کانال ${channelUsername} شوید.`, {
+            bot.sendMessage(chatId, channelJoin, {
                 reply_markup: {
                     keyboard: [
                         [{text: joined}]
@@ -117,7 +123,8 @@ bot.on('message', async (msg) => {
         console.log("this is id " + msg.from.id);
         // Check if the user is a member of the channel
         let isMember = await checkChannelMembership(chatId, msg.from.id);
-        if (isMember) {
+        let isMember2 = await checkChannelMembership2(chatId, msg.from.id);
+        if (isMember && isMember2) {
 
             try {
                 await axios.post('http://localhost:3000/start', {
@@ -135,12 +142,12 @@ bot.on('message', async (msg) => {
                 await bot.sendMessage(chatId, error);
             }
 
-            await bot.sendMessage(chatId, welcomeMessage);
+            // await bot.sendMessage(chatId, welcomeMessage);
             await sendCustomMessage(bot, chatId);
 
 
         } else {
-            bot.sendMessage(chatId, `لطفا ابتدا عضو کانال ${channelUsername} شوید.`, {
+            bot.sendMessage(chatId, channelJoin, {
                 reply_markup: {
                     keyboard: [
                         [{text: joined}]
@@ -155,8 +162,9 @@ bot.on('message', async (msg) => {
     if (text === makeImaginationReal) {
         console.log("this is id " + msg.from.id);
         let isMember = await checkChannelMembership(chatId, msg.from.id);
-        if (!isMember) {
-            bot.sendMessage(chatId, `لطفا ابتدا عضو کانال ${channelUsername} شوید.`, {
+        let isMember2 = await checkChannelMembership2(chatId, msg.from.id);
+        if (!(isMember && isMember2)) {
+            bot.sendMessage(chatId, channelJoin, {
                 reply_markup: {
                     keyboard: [
                         [{text: joined}]
@@ -221,7 +229,6 @@ bot.on('message', async (msg) => {
         await bot.sendMessage(chatId, continueExplain);
         userStates.set(chatId, {...userState, isRequestingImage: true});
     } else if (text === userProfile) {
-        // localhost:3000/messages?userName=Nothingtoexplaintoyou
         let textProfile = "";
         try {
             const url = 'http://localhost:3000/messages?idChat=' + encodeURIComponent(msg.from.id);
@@ -272,6 +279,13 @@ bot.on('message', async (msg) => {
             bot.sendMessage(chatId, `از دوستانت دعوت کن: ${referralLink}`);
             sendCustomMessage(bot, chatId);
         }
+    } else if (text === aboutUs) {
+        await bot.sendMessage(chatId, aboutUsText);
+        sendCustomMessage(bot, chatId);
+    } else if (text === messageChargeOption1) {
+        await bot.sendMessage(chatId, introductionPayment);
+        await bot.sendMessage(chatId, plansMessage);
+        sendCustomMessage(bot, chatId);
     } else {
     }
 });
@@ -314,6 +328,17 @@ bot.on('callback_query', async (callbackQuery) => {
 async function checkChannelMembership(chatId, userId) {
     try {
         const member = await bot.getChatMember(channelUsername, userId);
+        return member && (member.status === 'member' || member.status === 'administrator' || member.status === 'creator');
+    } catch (error) {
+        console.error('Error checking channel membership:', error);
+        bot.sendMessage(chatId, 'خطا در بررسی عضویت کانال.');
+        return false;
+    }
+}
+
+async function checkChannelMembership2(chatId, userId) {
+    try {
+        const member = await bot.getChatMember(channelUsername2, userId);
         return member && (member.status === 'member' || member.status === 'administrator' || member.status === 'creator');
     } catch (error) {
         console.error('Error checking channel membership:', error);
