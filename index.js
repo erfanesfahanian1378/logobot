@@ -57,7 +57,7 @@ bot.on('message', async (msg) => {
             // Handle the referral logic here
             console.log(`User ${username || name} was referred by ${referralId}`);
             try {
-                await axios.post('http://localhost:3000/invite', {
+                await axios.post('http://localhost:3001/invite', {
                     idChatInvitePerson: referralId,
                     idChatGuest: msg.from.id
                 });
@@ -73,7 +73,7 @@ bot.on('message', async (msg) => {
         if (!(isMember && isMember2)) {
             console.log("should be here");
             try {
-                await axios.post('http://localhost:3000/start', {
+                await axios.post('http://localhost:3001/start', {
                     username: username,
                     name: name,
                     surName: surName,
@@ -96,7 +96,7 @@ bot.on('message', async (msg) => {
         } else {
             console.log("is it in else ?");
             try {
-                await axios.post('http://localhost:3000/start', {
+                await axios.post('http://localhost:3001/start', {
                     username: username,
                     name: name,
                     surName: surName,
@@ -127,7 +127,7 @@ bot.on('message', async (msg) => {
         if (isMember && isMember2) {
 
             try {
-                await axios.post('http://localhost:3000/start', {
+                await axios.post('http://localhost:3001/start', {
                     username: username,
                     name: name,
                     surName: surName,
@@ -184,7 +184,7 @@ bot.on('message', async (msg) => {
         try {
             await bot.sendMessage(chatId, waitingMessage);
 
-            const response = await axios.post('http://localhost:3000/dall', {
+            const response = await axios.post('http://localhost:3001/dall', {
                 prompt: userState.lastText + text,
                 idChat: msg.from.id
             });
@@ -231,7 +231,7 @@ bot.on('message', async (msg) => {
     } else if (text === userProfile) {
         let textProfile = "";
         try {
-            const url = 'http://localhost:3000/messages?idChat=' + encodeURIComponent(msg.from.id);
+            const url = 'http://localhost:3001/messages?idChat=' + encodeURIComponent(msg.from.id);
             const response = await axios.get(url);
             console.log(response.data[0]);
             let ProteinTeam = response.data[0].name; // Assuming this is how you get the team's name
@@ -262,7 +262,7 @@ bot.on('message', async (msg) => {
     } else if (text === messageChargeByInvite) {
         let inviteCompletedOrNot = false;
         try {
-            await axios.get('http://localhost:3000/invite?idChat=' + msg.from.id);
+            await axios.get('http://localhost:3001/invite?idChat=' + msg.from.id);
             inviteCompletedOrNot = true;
             console.log("checkCompleted");
         } catch (error) {
@@ -312,7 +312,7 @@ bot.on('callback_query', async (callbackQuery) => {
 
     // Send the user's gender to your backend server
     try {
-        await axios.post('http://localhost:3000/user-gender', {
+        await axios.post('http://localhost:3001/user-gender', {
             userId: userId,
             gender: gender
         });
