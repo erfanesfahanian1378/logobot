@@ -23,7 +23,7 @@ let aboutUsText = `
 At Protein, we are a dynamic and innovative team in the field of AI. 🚀👨‍💻👩‍💻 Offering a variety of creative services and solutions, 🌟🛠️ we strive to provide the public access to advanced AI tools. Our goal is to facilitate professional activities for working individuals by leveraging the power of AI. 💡🤖💼 We believe that everyone should have the opportunity to benefit from the wonders of this incredible technology for their own and societal good. 🌍❤️ Join us in building a brighter and smarter future together. 🌈🛠️🔮
 `;
 let aboutUs = 'درباره ما | about us';
-let promoteUs = "با معرفی ما به دوستان خود از ما حمایت کنید . \n\n Support us by introducing us to your friends";
+let promoteUs = "با معرفی ما به دوستان خود از ما حمایت کنید . پس از دعوت از دوستان برای فعال شدن اشتراک دوباره به منو دعوت از دوستان مراجعه کنید. \n\n Support us by introducing us to your friends for activating your subscription after inviting your friends go to the invite your friends menu.";
 let continueExplainingOption = 'ادامه توضیحات';
 let continueExplain = 'ادامه توضیحات رو بنویسید. | Tell me more';
 let needDeCharge = 'خطا در ارسال پیام. سقف مجاز استفاده شما از ربات تمام شده باید شارژ کنید یا از منو حساب کاربری از دوستان خود دعوت کنید که در ربات عضو شوند' + 'need to recharge your account go to your profile recharge your account or invite friends.';
