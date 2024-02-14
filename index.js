@@ -1,6 +1,10 @@
 const TelegramBot = require('node-telegram-bot-api');
 const axios = require('axios');
-const token = '6439788591:AAHSXV8yBfR6pBoL9cVj1Hb3qZgqDNLDYNM';
+// const token = '6439788591:AAHSXV8yBfR6pBoL9cVj1Hb3qZgqDNLDYNM'; //this is the main token
+
+const token = '6496151980:AAE7RID0097w5U3rHKLEfYI3CTjn30Unb4s' // this the test token
+
+
 const bot = new TelegramBot(token, {polling: true});
 let ifItsJoined = false;
 const userStates = new Map();
@@ -14,8 +18,10 @@ let introduction = "✨تصور کنید در دنیایی زندگی می کن�
 const joined = 'عضو شدم';
 let mainMenu = 'منو اصلی | Main Menu';
 let inviteAlert = 'کوردرایی عزیز باید حداقل ۲ نفر از دوستانت را با استفاده از لینک زیر به ربات ما دعوت کنی ';
+const desireSize = ["سایز مورد نظر شما برا عکس \n whats the size of your output image", "1024x1024", " 1792x1024", "توجه داشته باشید که درخواست عکس با سایز دلخواه به اندازه دو درخواست از شما شارژ کم میکند \n Note that requesting a photo with the desired size will cost you less than two requests"];
 let successInvite = "به حساب شما دسترسی مجدد به ربات کوردرا داده شد";
 let makeImaginationReal = 'خیال پردازی هایت را به تصویر بکش 🎨👨🏻‍🎨 | 🎨👨🏻‍🎨 Draw your imagination';
+let makeImaginationRealWithSize = 'خیال پردازی هایت را با سایز دلخواهت به تصویر بکش🎨👨🏻‍|🎨👨🏻Draw your imagination with the size you want'
 let userProfile = 'حساب کاربری شما📖✏️|Your profile';
 let aboutUsText = `
 ما در پروتئین، یک تیم پویا و نوآور در عرصه هوش مصنوعی هستیم. 🚀👨‍💻👩‍💻 با ارائه خدمات و سرویس‌های متنوع و خلاقانه، 🌟🛠️ می‌کوشیم تا دسترسی عموم جامعه به ابزارهای پیشرفته هوش مصنوعی را فراهم آوریم. هدف ما، تسهیل فعالیت‌های حرفه‌ای افراد شاغل از طریق به کارگیری قدرت هوش مصنوعی است. 💡🤖💼 ما بر این باوریم که هر فردی باید بتواند از مزایای این فناوری شگفت‌انگیز به نفع خود و جامعه‌اش بهره ببرد. 🌍❤️ با ما همراه باشید تا با هم آینده‌ای روشن‌تر و هوشمندتر بسازیم. 🌈🛠️🔮
@@ -24,7 +30,7 @@ At Protein, we are a dynamic and innovative team in the field of AI. 🚀👨‍
 `;
 let aboutUs = 'درباره ما | about us';
 let promoteUs = "با معرفی ما به دوستان خود از ما حمایت کنید . پس از دعوت از دوستان برای فعال شدن اشتراک دوباره به منو دعوت از دوستان مراجعه کنید. \n\n Support us by introducing us to your friends for activating your subscription after inviting your friends go to the invite your friends menu.";
-let continueExplainingOption = 'ادامه توضیحات';
+let continueExplainingOption = 'ادامه توضیحات | continue explaining';
 let continueExplain = 'ادامه توضیحات رو بنویسید. | Tell me more';
 let needDeCharge = 'خطا در ارسال پیام. سقف مجاز استفاده شما از ربات تمام شده باید شارژ کنید یا از منو حساب کاربری از دوستان خود دعوت کنید که در ربات عضو شوند' + 'need to recharge your account go to your profile recharge your account or invite friends.';
 let error = 'مشکلی پیش آمده است.';
@@ -69,10 +75,13 @@ Thank you for being awesome! 🎉💐`;
     if (!userState) {
         userState = {
             isRequestingImage: false,
+            isRequestingImageWithSize: false,
             isRequestingRecharge: false,
             isCompletingProfile: false,
             isInvitingFriend: false,
-            lastText: ""
+            isFinalRequestImage: false,
+            lastText: "",
+            size: ""
         };
         userStates.set(chatId, userState);
     }
@@ -147,9 +156,22 @@ Thank you for being awesome! 🎉💐`;
             isRequestingImage: false,
             isRequestingRecharge: false,
             isCompletingProfile: false,
-            isInvitingFriend: false
+            isInvitingFriend: false,
+            isRequestingImageWithSize: false,
+            isFinalRequestImage: false,
+            size: ""
         });
 
+    } else if (text === mainMenu) {
+        userStates.set(chatId, {
+            ...userState,
+            lastText: "",
+            isRequestingImageWithSize: false,
+            isFinalRequestImage: false,
+            isRequestingImage: false,
+            size: ""
+        });
+        await sendCustomMessage(bot, chatId);
     } else if (text === joined) {
         console.log("this is id " + msg.from.id);
         // Check if the user is a member of the channel
@@ -210,6 +232,83 @@ Thank you for being awesome! 🎉💐`;
         }
 
 
+    } else if (text === makeImaginationRealWithSize) {
+        console.log("this is id " + msg.from.id);
+        let isMember = await checkChannelMembership(chatId, msg.from.id);
+        let isMember2 = await checkChannelMembership2(chatId, msg.from.id);
+        if (!(isMember && isMember2)) {
+            bot.sendMessage(chatId, channelJoin, {
+                reply_markup: {
+                    keyboard: [
+                        [{text: joined}]
+                    ],
+                    resize_keyboard: true,
+                    one_time_keyboard: true
+                }
+            });
+        } else {
+            userStates.set(chatId, {...userState, isRequestingImageWithSize: true});
+            await bot.sendMessage(chatId, desireSize[0], {
+                reply_markup: {
+                    keyboard: [
+                        [{text: desireSize[1]}],
+                        [{text: desireSize[2]}],
+                        [{text: mainMenu}]
+                    ],
+                    resize_keyboard: true,
+                    one_time_keyboard: true
+                }
+            });
+        }
+
+
+    } else if (userState.isRequestingImageWithSize) {
+        console.log("are you in here ?");
+        userStates.set(chatId, {...userState, size: text, isFinalRequestImage: true, isRequestingImageWithSize: false});
+        await bot.sendMessage(chatId, introduction);
+    } else if (userState.isFinalRequestImage) {
+        try {
+            await bot.sendMessage(chatId, waitingMessage);
+
+            const response = await axios.post('http://localhost:3001/dallSize', {
+                prompt: userState.lastText + text,
+                idChat: msg.from.id,
+                size: userState.size
+            });
+            await bot.sendMessage(chatId, `پاسخ هنرمند پروتیین به شما:  ${response.data}`);
+            let describe = userState.lastText + "" + text
+            let forwardMessage = `درخواست کاربران به هنرمند پروتیین: ${describe}\nجواب هنرمندمون: ${response.data}`;
+            await bot.sendMessage(channelUsername, forwardMessage);
+            bot.sendMessage(chatId, addToCurrentImage, {
+                reply_markup: {
+                    keyboard: [
+                        [{text: continueExplainingOption}],
+                        [{text: mainMenu}],
+                    ],
+                    resize_keyboard: true,
+                    one_time_keyboard: true
+                }
+            });
+
+
+        } catch (error) {
+            console.error('Error sending data to server:', error);
+            await bot.sendMessage(chatId, needDeCharge, {
+                reply_markup: {
+                    keyboard: [
+                        [{text: messageChargeOption1}],
+                        [{text: messageChargeByInvite}],
+                        [{text: mainMenu}],
+                    ],
+                    resize_keyboard: true,
+                    one_time_keyboard: true
+                }
+            });
+            // await sendCustomMessage(bot, chatId);
+            // await bot.sendMessage(chatId, error.response.data.error);
+        }
+        userStates.set(chatId, {...userState, isRequestingImage: false, isFinalRequestImage: false, lastText: text});
+
     } else if (userState.isRequestingImage) {
         console.log(userState.lastText);
         try {
@@ -253,9 +352,6 @@ Thank you for being awesome! 🎉💐`;
         }
         userStates.set(chatId, {...userState, isRequestingImage: false, lastText: text});
 
-    } else if (text === mainMenu) {
-        userStates.set(chatId, {...userState, lastText: ""});
-        await sendCustomMessage(bot, chatId);
     } else if (text === continueExplainingOption) {
         await bot.sendMessage(chatId, continueExplain);
         userStates.set(chatId, {...userState, isRequestingImage: true});
@@ -357,6 +453,7 @@ async function sendCustomMessage(bot, chatId) {
         reply_markup: {
             keyboard: [
                 [{text: makeImaginationReal}],
+                [{text: makeImaginationRealWithSize}],
                 [{text: userProfile}],
                 [{text: aboutUs}]
             ],
