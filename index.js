@@ -1,8 +1,8 @@
 const TelegramBot = require('node-telegram-bot-api');
 const axios = require('axios');
-// const token = '6439788591:AAHSXV8yBfR6pBoL9cVj1Hb3qZgqDNLDYNM'; //this is the main token
+const token = '6439788591:AAHSXV8yBfR6pBoL9cVj1Hb3qZgqDNLDYNM'; //this is the main token
 
-const token = '6496151980:AAE7RID0097w5U3rHKLEfYI3CTjn30Unb4s' // this the test token
+// const token = '6496151980:AAE7RID0097w5U3rHKLEfYI3CTjn30Unb4s' // this the test token
 
 
 const bot = new TelegramBot(token, {polling: true});
@@ -18,7 +18,7 @@ let introduction = "✨تصور کنید در دنیایی زندگی می کن�
 const joined = 'عضو شدم|I joined';
 let mainMenu = 'منو اصلی | Main Menu';
 let inviteAlert = 'کوردرایی عزیز باید حداقل ۲ نفر از دوستانت را با استفاده از لینک زیر به ربات ما دعوت کنی ';
-const desireSize = ["سایز مورد نظر شما برا عکس \n whats the size of your output image", "1024x1024", " 1792x1024", "توجه داشته باشید که درخواست عکس با سایز دلخواه به اندازه دو درخواست از شما شارژ کم میکند \n Note that requesting a photo with the desired size will cost you less than two requests"];
+const desireSize = ["سایز مورد نظر شما برا عکس \n whats the size of your output image", "1792x1024", "1024x1792", "توجه داشته باشید که درخواست عکس با سایز دلخواه به اندازه دو درخواست از شما شارژ کم میکند \n Note that requesting a photo with the desired size will cost you less than two requests"];
 let successInvite = "به حساب شما دسترسی مجدد به ربات کوردرا داده شد";
 let makeImaginationReal = 'خیال پردازی هایت را به تصویر بکش 🎨👨🏻‍🎨 | 🎨👨🏻‍🎨 Draw your imagination';
 let makeImaginationRealWithSize = 'خیال پردازی هایت را با سایز دلخواهت به تصویر بکش🎨👨🏻‍|🎨👨🏻Draw your imagination with the size you want'
