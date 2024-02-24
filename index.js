@@ -1,14 +1,60 @@
 const TelegramBot = require('node-telegram-bot-api');
 const axios = require('axios');
-const token = '6439788591:AAHSXV8yBfR6pBoL9cVj1Hb3qZgqDNLDYNM'; //this is the main token
+// const token = '6439788591:AAHSXV8yBfR6pBoL9cVj1Hb3qZgqDNLDYNM'; //this is the main token
 
-// const token = '6496151980:AAE7RID0097w5U3rHKLEfYI3CTjn30Unb4s' // this the test token
-
-
+const token = '6496151980:AAE7RID0097w5U3rHKLEfYI3CTjn30Unb4s' // this the test token
 const bot = new TelegramBot(token, {polling: true});
 let ifItsJoined = false;
 const userStates = new Map();
 const channelUsername = '@imaginAi';
+const waitingForLogo = ["⏳" , "پیامت برای هنرمند سرزمین پروتئین ارسال شد یه کوچولو دندون رو جیگر بزار تا کارش تموم بشه و عکس رو برات بفرسته🤩\n\nYour message has been sent to the artist of Protein Land. Just hang in there a little longer, and they'll wrap up their work. They'll send you the photo 🤩."]
+const specifyTypeOfLogo = ["نوع لوگو را مشخص کنید🖼\n\n🖼specify type of logo",
+    {text: "مجمع | emblem", value: "emblem"}, {text: "لوگو نشانگر|pictorial mark", value: "pictorial mark"},
+    {text: "واژه‌نما|word mark", value: "word mark"}, {
+        text: "نمادی|letter mark",
+        value: "letter mark"
+    }, {text: "انتزاعی|Abstract", value: "Abstract"},
+    {text: "مسکات|Mascot", value: "mascot"}, {text: "ترکیبی|Combination", value: "combination"}];
+const specifyStyleOfLogo = ["سبک لوگو را مشخص کنید\n\nspecify the style of logo", {text: "صاف|flat", value: "flat"},
+    {text: "هندسی|geometric", value: "geometric"}, {text: "خطی|line art", value: "line art"}, {
+        text: "کارتونی|cartoon",
+        value: "cartoon"
+    },
+    {text: "واقع گرایانه|Realistic", value: "Realistic"}, {
+        text: "سرسری|sketchy",
+        value: "sketchy"
+    }, {text: "دستی|hand-drawn", value: "hand-drawn"}];
+const preferenceLogo = ["ترجیج میدهید لوگو شما \n would you prefer your logo to be", {
+    text: "پرجنب و جوش | vibrant",
+    value: "vibrant"
+},
+    {text: "خنثی | neutral", value: "neutral"}, {text: "جدی | serious", value: "serious"}]
+
+const colorPalette = ["چه پالت رنگی برای لوگو خود میخواهید؟\n\nwhat color palette would you like for your logo", {
+    text: "تیره،متوسط،آبی روشن|dark,medium,light blue",
+    value: "dark,medium,light blue"
+},
+    {text: "قرمز لوتوس،صورتی|lotus red, pink", value: "Lotus Red, Pink, Blush Pink"},
+    {text: "آبی،بنفش|blue and purple", value: "blue and purple"}, {
+        text: "آبی،قهوه‌ای|Blue and brown",
+        value: "blue and brown"
+    },
+    {
+        text: "نیروی‌دریایی زرد و بژ | navy,yellow,beige",
+        value: "Navy, Yellow, Beige"
+    }, {text: "بژ،قهوه‌ای،قهوه‌ای تیره|beige,brown,dark brown", value: "Beige, Brown, Dark Brown"},
+    {text: "نیروی‌دریایی،نارنجی|navy and orange", value: "navy and orange"}, {
+        text: "سبز،خاکستری|green and gray",
+        value: "green and gray"
+    }, {text: "خاکستری،آبی،زرد|gray,blue,yellow", value: "Gray, Baby Blue, Canary Yellow"},
+    {
+        text: "آبی،زرد،سبز|blue,yellow,green",
+        value: "blue,yellow and green"
+    }, {text: "گل‌همیشه بهار،قهوه‌ای تیره|Marigold,dark brown", value: "Marigold and Dark Brown"},
+    {text: "سبزعمیق،سبزتیره|deep green,dark green", value: "Deep Forest Green and Dark Sea Green"},
+    {text: "آبی‌روشن،صورتی‌زرشکی|light blue and crimson pink", value: "Light Blue and Crimson Pink"}];
+const textOrganization = ["نام برند خود را برای لوگو وارد کنید \n\n Please enter your brands name for the logo", "🧑🏻‍💻"]
+const complexity = ["در مقیاس ۱ تا ۱۰ میزان سادگی یا پیچیدگی لوگو شما چه قدر است (۱ بسیار ساده و مینیمالیتی ، ۱۰ بسیار پیچیده ، مفصل)", "\n\nHow would you like the logo's complexity ? \n 1- being extremely clean and simple \n 2-being extremely detailed and complex"]
 const channelUsername2 = '@ProteinTeam';
 const messageChargeOption1 = "شارژ حساب کاربری | Charge your account";
 const messageChargeByInvite = 'استفاده مجدد از ربات با دعوت دوستان\ninvite friends to get free subscription';
@@ -23,6 +69,7 @@ let successInvite = "به حساب شما دسترسی مجدد به ربات ک
 let makeImaginationReal = 'خیال پردازی هایت را به تصویر بکش 🎨👨🏻‍🎨 | 🎨👨🏻‍🎨 Draw your imagination';
 let makeImaginationRealWithSize = 'خیال پردازی هایت را با سایز دلخواهت به تصویر بکش🎨👨🏻‍|🎨👨🏻Draw your imagination with the size you want'
 let userProfile = 'حساب کاربری شما📖✏️|Your profile';
+let createYourLogo = "لوگو بسازیم🖼|🖼create logo";
 let aboutUsText = `
 ما در پروتئین، یک تیم پویا و نوآور در عرصه هوش مصنوعی هستیم. 🚀👨‍💻👩‍💻 با ارائه خدمات و سرویس‌های متنوع و خلاقانه، 🌟🛠️ می‌کوشیم تا دسترسی عموم جامعه به ابزارهای پیشرفته هوش مصنوعی را فراهم آوریم. هدف ما، تسهیل فعالیت‌های حرفه‌ای افراد شاغل از طریق به کارگیری قدرت هوش مصنوعی است. 💡🤖💼 ما بر این باوریم که هر فردی باید بتواند از مزایای این فناوری شگفت‌انگیز به نفع خود و جامعه‌اش بهره ببرد. 🌍❤️ با ما همراه باشید تا با هم آینده‌ای روشن‌تر و هوشمندتر بسازیم. 🌈🛠️🔮
 
@@ -80,8 +127,10 @@ Thank you for being awesome! 🎉💐`;
             isCompletingProfile: false,
             isInvitingFriend: false,
             isFinalRequestImage: false,
+            createLogo: false,
             lastText: "",
-            size: ""
+            size: "",
+            steps: ""
         };
         userStates.set(chatId, userState);
     }
@@ -159,7 +208,9 @@ Thank you for being awesome! 🎉💐`;
             isInvitingFriend: false,
             isRequestingImageWithSize: false,
             isFinalRequestImage: false,
-            size: ""
+            createLogo: false,
+            size: "",
+            steps: ""
         });
 
     } else if (text === mainMenu) {
@@ -169,9 +220,194 @@ Thank you for being awesome! 🎉💐`;
             isRequestingImageWithSize: false,
             isFinalRequestImage: false,
             isRequestingImage: false,
-            size: ""
+            createLogo: false,
+            size: "",
+            steps: ""
         });
         await sendCustomMessage(bot, chatId);
+    } else if (text === createYourLogo) {
+        console.log(userState);
+        await bot.sendMessage(chatId, specifyTypeOfLogo[0], {
+            reply_markup: {
+                keyboard: [
+                    [{text: specifyTypeOfLogo[1].text}],
+                    [{text: specifyTypeOfLogo[2].text}],
+                    [{text: specifyTypeOfLogo[3].text}],
+                    [{text: specifyTypeOfLogo[4].text}],
+                    [{text: specifyTypeOfLogo[5].text}],
+                    [{text: specifyTypeOfLogo[6].text}],
+                    [{text: specifyTypeOfLogo[7].text}],
+                    [{text: mainMenu}]
+                ],
+                resize_keyboard: true,
+                one_time_keyboard: true
+            }
+        });
+        userStates.set(chatId, {
+            ...userState,
+            lastText: "",
+            isRequestingImageWithSize: false,
+            isFinalRequestImage: false,
+            isRequestingImage: false,
+            createLogo: true,
+            size: "",
+            steps: "1"
+        });
+    } else if (userState.createLogo) {
+        let textPrompt = '';
+        if (userState.steps === "1") {
+            for (let i = 1; i < 8; i++) {
+                if (text === specifyTypeOfLogo[i].text) {
+                    textPrompt = specifyTypeOfLogo[i].value;
+                    userStates.set(chatId, {
+                        ...userState,
+                        createLogo: true,
+                        steps: "2",
+                        lastText: "Create me a logo that the type of logo is " + specifyTypeOfLogo[i].value
+                    });
+                    await bot.sendMessage(chatId, "👀");
+                    await bot.sendMessage(chatId, specifyStyleOfLogo[0], {
+                        reply_markup: {
+                            keyboard: [
+                                [{text: specifyStyleOfLogo[1].text}],
+                                [{text: specifyStyleOfLogo[2].text}],
+                                [{text: specifyStyleOfLogo[3].text}],
+                                [{text: specifyStyleOfLogo[4].text}],
+                                [{text: specifyStyleOfLogo[5].text}],
+                                [{text: specifyStyleOfLogo[6].text}],
+                                [{text: specifyStyleOfLogo[7].text}],
+                                [{text: mainMenu}]
+                            ],
+                            resize_keyboard: true,
+                            one_time_keyboard: true
+                        }
+                    });
+                }
+            }
+        } else if (userState.steps === "2") {
+            textPrompt = "";
+            for (let i = 1; i < 8; i++) {
+                if (text === specifyStyleOfLogo[i].text) {
+                    textPrompt = specifyStyleOfLogo[i].value;
+                    await bot.sendMessage(chatId, "💅🏻");
+                    userStates.set(chatId, {
+                        ...userState,
+                        createLogo: true,
+                        steps: "3",
+                        lastText: userState.lastText + " " + "and the style of the logo is " + textPrompt
+                    });
+                    await bot.sendMessage(chatId, preferenceLogo[0], {
+                        reply_markup: {
+                            keyboard: [
+                                [{text: preferenceLogo[1].text}],
+                                [{text: preferenceLogo[2].text}],
+                                [{text: preferenceLogo[3].text}],
+                                [{text: mainMenu}]
+                            ],
+                            resize_keyboard: true,
+                            one_time_keyboard: true
+                        }
+                    });
+                }
+            }
+        } else if (userState.steps === "3") {
+            textPrompt = "";
+            for (let i = 1; i < 4; i++) {
+                if (text === preferenceLogo[i].text) {
+                    textPrompt = preferenceLogo[i].value;
+                    await bot.sendMessage(chatId, "🤯");
+                    let objectMenu = []
+                    for (let i = 1; i < 11; i++) {
+                        objectMenu[i - 1] = [{text: i}]
+                    }
+                    objectMenu[objectMenu.length] = [{text: mainMenu}]
+                    userStates.set(chatId, {
+                        ...userState,
+                        createLogo: true,
+                        steps: "4",
+                        lastText: userState.lastText + " " + "and I want the logo to be " + textPrompt
+                    });
+                    await bot.sendMessage(chatId, complexity[0] + complexity[1], {
+                        reply_markup: {
+                            keyboard: objectMenu,
+                            resize_keyboard: true,
+                            one_time_keyboard: true
+                        }
+                    });
+                }
+            }
+        } else if (userState.steps === "4") {
+            textPrompt = "";
+            userStates.set(chatId, {
+                ...userState,
+                createLogo: true,
+                steps: "5",
+                lastText: userState.lastText + " " + "and the complexity of my logo is " + text + " out of 10"
+            });
+            await bot.sendMessage(chatId, "🎨");
+            let objectMenu = []
+            for (let i = 1; i < colorPalette.length; i++) {
+                objectMenu[i - 1] = [{text: colorPalette[i].text}]
+            }
+            objectMenu[objectMenu.length] = [{text: mainMenu}]
+            await bot.sendMessage(chatId, colorPalette[0], {
+                reply_markup: {
+                    keyboard: objectMenu,
+                    resize_keyboard: true,
+                    one_time_keyboard: true
+                }
+            });
+        } else if (userState.steps === "5") {
+            textPrompt = "";
+            for (let i = 1; i < colorPalette.length; i++) {
+                if (text === colorPalette[i].text) {
+                    textPrompt = colorPalette[i].value;
+                    userStates.set(chatId, {
+                        ...userState,
+                        createLogo: true,
+                        steps: "6",
+                        lastText: userState.lastText + " and the color palette is " + textPrompt
+                    });
+                }
+            }
+            await bot.sendMessage(chatId, textOrganization[1]);
+            await bot.sendMessage(chatId, textOrganization[0]);
+        } else if (userState.steps === "6") {
+            await bot.sendMessage(chatId, waitingForLogo[0]);
+            await bot.sendMessage(chatId, waitingForLogo[1]);
+            try {
+                const response = await axios.post('http://localhost:3001/dall', {
+                    prompt: userState.lastText + " and the name of my brand that i want to be in my logo is " + text,
+                    idChat: msg.from.id
+                });
+                await bot.sendMessage(chatId, `پاسخ هنرمند پروتیین به شما:  ${response.data}`);
+                let describe = userState.lastText + "" + text
+                let forwardMessage = `این عکس توسط لوگو ساز اختصاصی کوردرا تولید شده🚀 \n this picture is created by cordraw logo creator🚀 ${describe}\nجواب هنرمندمون: ${response.data}`;
+                await bot.sendMessage(channelUsername, forwardMessage);
+                await sendCustomMessage(bot, chatId);
+                userStates.set(chatId, {
+                    ...userState,
+                    createLogo: false,
+                    steps: "",
+                    lastText: ""
+                });
+                await console.log(userState)
+                console.log(text);
+            } catch (error) {
+                console.error('Error sending data to server:', error);
+                await bot.sendMessage(chatId, error);
+            }
+
+
+            // userStates.set(chatId, {
+            //     ...userState,
+            //     createLogo: true,
+            //     steps: "6",
+            //     lastText: userState.lastText + " and the name of my brand that i want to be in my logo is " + text
+            // });
+            // await console.log(userState)
+            // console.log(text);
+        }
     } else if (text === joined) {
         console.log("this is id " + msg.from.id);
         // Check if the user is a member of the channel
@@ -454,6 +690,7 @@ async function sendCustomMessage(bot, chatId) {
             keyboard: [
                 [{text: makeImaginationReal}],
                 [{text: makeImaginationRealWithSize}],
+                [{text: createYourLogo}],
                 [{text: userProfile}],
                 [{text: aboutUs}]
             ],
