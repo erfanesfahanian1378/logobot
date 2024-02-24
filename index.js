@@ -1,13 +1,12 @@
 const TelegramBot = require('node-telegram-bot-api');
 const axios = require('axios');
-const token = '6439788591:AAHSXV8yBfR6pBoL9cVj1Hb3qZgqDNLDYNM'; //this is the main token
-
-// const token = '6496151980:AAE7RID0097w5U3rHKLEfYI3CTjn30Unb4s' // this the test token
+// const token = '6439788591:AAHSXV8yBfR6pBoL9cVj1Hb3qZgqDNLDYNM'; //this is the main token
+const token = '6496151980:AAE7RID0097w5U3rHKLEfYI3CTjn30Unb4s' // this the test token
 const bot = new TelegramBot(token, {polling: true});
 let ifItsJoined = false;
 const userStates = new Map();
 const channelUsername = '@imaginAi';
-const waitingForLogo = ["⏳" , "پیامت برای هنرمند سرزمین پروتئین ارسال شد یه کوچولو دندون رو جیگر بزار تا کارش تموم بشه و عکس رو برات بفرسته🤩\n\nYour message has been sent to the artist of Protein Land. Just hang in there a little longer, and they'll wrap up their work. They'll send you the photo 🤩."]
+const waitingForLogo = ["⏳", "پیامت برای هنرمند سرزمین پروتئین ارسال شد یه کوچولو دندون رو جیگر بزار تا کارش تموم بشه و عکس رو برات بفرسته🤩\n\nYour message has been sent to the artist of Protein Land. Just hang in there a little longer, and they'll wrap up their work. They'll send you the photo 🤩."]
 const specifyTypeOfLogo = ["نوع لوگو را مشخص کنید🖼\n\n🖼specify type of logo",
     {text: "مجمع | emblem", value: "emblem"}, {text: "لوگو نشانگر|pictorial mark", value: "pictorial mark"},
     {text: "واژه‌نما|word mark", value: "word mark"}, {
@@ -54,6 +53,7 @@ const colorPalette = ["چه پالت رنگی برای لوگو خود میخو�
     {text: "سبزعمیق،سبزتیره|deep green,dark green", value: "Deep Forest Green and Dark Sea Green"},
     {text: "آبی‌روشن،صورتی‌زرشکی|light blue and crimson pink", value: "Light Blue and Crimson Pink"}];
 const textOrganization = ["نام برند خود را برای لوگو وارد کنید \n\n Please enter your brands name for the logo", "🧑🏻‍💻"]
+const jobEsense = ["🗂", "حوزه‌کاری شما در چه زمینه‌ای است به طور مثال : قصابی ، کتاب فروشی ، مهدکودک ", "\n\nWhat is the field of your work ? for instance : butcher , kindergarten , bookstore"];
 const complexity = ["در مقیاس ۱ تا ۱۰ میزان سادگی یا پیچیدگی لوگو شما چه قدر است (۱ بسیار ساده و مینیمالیتی ، ۱۰ بسیار پیچیده ، مفصل)", "\n\nHow would you like the logo's complexity ? \n 1- being extremely clean and simple \n 2-being extremely detailed and complex"]
 const channelUsername2 = '@ProteinTeam';
 const messageChargeOption1 = "شارژ حساب کاربری | Charge your account";
@@ -373,11 +373,22 @@ Thank you for being awesome! 🎉💐`;
             await bot.sendMessage(chatId, textOrganization[1]);
             await bot.sendMessage(chatId, textOrganization[0]);
         } else if (userState.steps === "6") {
+            userStates.set(chatId, {
+                ...userState,
+                createLogo: true,
+                steps: "7",
+                lastText: userState.lastText + " and the name of my brand that i want to be in my logo is " + text
+            });
+            await bot.sendMessage(chatId, jobEsense[0]);
+            await bot.sendMessage(chatId, jobEsense[1] + jobEsense[2]);
+        } else if (userState.steps === "7") {
             await bot.sendMessage(chatId, waitingForLogo[0]);
             await bot.sendMessage(chatId, waitingForLogo[1]);
+            let addToPrompt = "\n" +
+                "I am seeking the creation of a professional logo that encapsulates the essence of " + text + ". Please ensure the following preferences are meticulously integrated into the design:\n"
             try {
                 const response = await axios.post('http://localhost:3001/dall', {
-                    prompt: userState.lastText + " and the name of my brand that i want to be in my logo is " + text,
+                    prompt: addToPrompt + userState.lastText + " Just send me the exact logo picture.",
                     idChat: msg.from.id
                 });
                 await bot.sendMessage(chatId, `پاسخ هنرمند پروتیین به شما:  ${response.data}`);
