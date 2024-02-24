@@ -1,8 +1,8 @@
 const TelegramBot = require('node-telegram-bot-api');
 const axios = require('axios');
-// const token = '6439788591:AAHSXV8yBfR6pBoL9cVj1Hb3qZgqDNLDYNM'; //this is the main token
+const token = '6439788591:AAHSXV8yBfR6pBoL9cVj1Hb3qZgqDNLDYNM'; //this is the main token
 
-const token = '6496151980:AAE7RID0097w5U3rHKLEfYI3CTjn30Unb4s' // this the test token
+// const token = '6496151980:AAE7RID0097w5U3rHKLEfYI3CTjn30Unb4s' // this the test token
 const bot = new TelegramBot(token, {polling: true});
 let ifItsJoined = false;
 const userStates = new Map();
