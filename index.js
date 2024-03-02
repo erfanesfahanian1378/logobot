@@ -1,7 +1,7 @@
 const TelegramBot = require('node-telegram-bot-api');
 const axios = require('axios');
-const token = '6439788591:AAHSXV8yBfR6pBoL9cVj1Hb3qZgqDNLDYNM'; //this is the main token
-// const token = '6496151980:AAE7RID0097w5U3rHKLEfYI3CTjn30Unb4s' // this the test token
+// const token = '6439788591:AAHSXV8yBfR6pBoL9cVj1Hb3qZgqDNLDYNM'; //this is the main token
+const token = '6496151980:AAE7RID0097w5U3rHKLEfYI3CTjn30Unb4s' // this the test token
 const bot = new TelegramBot(token, {polling: true});
 let ifItsJoined = false;
 const userStates = new Map();
@@ -90,7 +90,7 @@ bot.on('message', async (msg) => {
     let name = msg.from.first_name + "";
 
     plansMessage = `سلام ${name} عزیز! 🌈
-خوشحالیم که می‌خوای با ما همراه باشی. برای شارژ حساب کاربریت و استفاده از 30 درخواست از ربات، فقط کافیه 44 هزار تومان به شماره کارت زیر واریز کنی و فیش پرداختی رو برامون ارسال کنی. 😊💳
+خوشحالیم که می‌خوای با ما همراه باشی. برای شارژ حساب کاربریت و استفاده از 20 درخواست از ربات، فقط کافیه 65 هزار تومان به شماره کارت زیر واریز کنی و فیش پرداختی رو برامون ارسال کنی. 😊💳
 شماره کارت: 🏦
 5054 1610 1394 1236
 نام صاحب کارت: ✨
@@ -388,11 +388,11 @@ Thank you for being awesome! 🎉💐`;
                 "I am seeking the creation of a professional logo that encapsulates the essence of " + text + ". Please ensure the following preferences are meticulously integrated into the design:\n"
             try {
                 const response = await axios.post('http://localhost:3001/dall', {
-                    prompt: addToPrompt + userState.lastText + " Just send me the exact logo picture.",
+                    prompt:  "I am seeking the creation of a professional logo that encapsulates the essence of " + text +  ". Please ensure the following preferences are meticulously integrated into the design:"+ userState.lastText + " Just send me the exact logo picture.",
                     idChat: msg.from.id
                 });
                 await bot.sendMessage(chatId, `پاسخ هنرمند پروتیین به شما:  ${response.data}`);
-                let describe = userState.lastText + "" + text
+                let describe = "I am seeking the creation of a professional logo that encapsulates the essence of " + text +  ". Please ensure the following preferences are meticulously integrated into the design:"+ userState.lastText + " Just send me the exact logo picture."
                 let forwardMessage = `این عکس توسط لوگو ساز اختصاصی کوردرا تولید شده🚀 \n this picture is created by cordraw logo creator🚀 ${describe}\nجواب هنرمندمون: ${response.data}`;
                 await bot.sendMessage(channelUsername, forwardMessage);
                 await sendCustomMessage(bot, chatId);
@@ -544,7 +544,7 @@ Thank you for being awesome! 🎉💐`;
                 reply_markup: {
                     keyboard: [
                         [{text: messageChargeOption1}],
-                        [{text: messageChargeByInvite}],
+                        // [{text: messageChargeByInvite}],
                         [{text: mainMenu}],
                     ],
                     resize_keyboard: true,
@@ -587,7 +587,7 @@ Thank you for being awesome! 🎉💐`;
                 reply_markup: {
                     keyboard: [
                         [{text: messageChargeOption1}],
-                        [{text: messageChargeByInvite}],
+                        // [{text: messageChargeByInvite}],
                         [{text: mainMenu}],
                     ],
                     resize_keyboard: true,
@@ -653,7 +653,7 @@ Here's the status of your subscriptions for Protein products:
                 reply_markup: {
                     keyboard: [
                         [{text: messageChargeOption1}],
-                        [{text: messageChargeByInvite}],
+                        // [{text: messageChargeByInvite}],
                         [{text: mainMenu}],
                     ],
                     resize_keyboard: true,
