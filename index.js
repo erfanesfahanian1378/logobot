@@ -803,7 +803,7 @@ async function broadcastMessage(chatId) {
             for (let i = 0; i < res.data.length; i++) {
                 console.log("this is for user Id" + res.data[i].idChat);
                 bot.sendMessage(res.data[i].idChat, messageBonus);
-                delay(50);
+                delay(500);
             }
         })
         .catch((error) => {
