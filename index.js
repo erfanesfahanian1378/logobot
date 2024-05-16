@@ -736,6 +736,7 @@ You either did not use the bot for 2 times or you got your bonus already. ❗`;
         sendCustomMessage(bot, chatId);
     } else if (text === broadcastPassword) {
         console.log("start broadcasting");
+        await bot.sendMessage(chatId, "it is started Sir");
         await broadcastMessage();
         console.log("end broadcasting");
     } else {
