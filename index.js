@@ -797,7 +797,7 @@ async function broadcastMessage(chatId) {
     console.log("we are in broadcat");
     await bot.sendMessage(chatId, "in a function");
 
-    axios.get('http://localhost:3005/allUser')
+   await axios.get('http://localhost:3005/allUser')
         .then((res) => {
             for (let i = 0; i < res.length; i++) {
                 console.log("this is for user Id" + res[i].idChat);
