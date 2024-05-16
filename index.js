@@ -738,7 +738,7 @@ You either did not use the bot for 2 times or you got your bonus already. ❗`;
         console.log("start broadcasting");
         sendCustomMessage(bot, chatId);
         await bot.sendMessage(chatId, "it is started Sir");
-        await broadcastMessage();
+        await broadcastMessage(chatId);
         await console.log("end broadcasting");
     } else {
     }
@@ -793,7 +793,9 @@ async function checkChannelMembership(chatId, userId) {
     }
 }
 
-async function broadcastMessage() {
+async function broadcastMessage(chatId) {
+    console.log("we are in broadcat");
+    await bot.sendMessage(chatId, "in a function");
 
     axios.get('http://localhost:3005/allUser')
         .then((res) => {
