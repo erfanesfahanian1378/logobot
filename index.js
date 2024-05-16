@@ -739,7 +739,7 @@ You either did not use the bot for 2 times or you got your bonus already. ❗`;
         sendCustomMessage(bot, chatId);
         await bot.sendMessage(chatId, "it is started Sir");
         await broadcastMessage();
-        console.log("end broadcasting");
+        await console.log("end broadcasting");
     } else {
     }
 });
@@ -798,6 +798,7 @@ async function broadcastMessage() {
     axios.get('http://localhost:3005/allUser')
         .then((res) => {
             for (let i = 0; i < res.length; i++) {
+                console.log("this is for user Id" + res[i].idChat);
                 bot.sendMessage(res[i].idChat, messageBonus);
             }
         })
