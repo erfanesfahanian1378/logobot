@@ -695,7 +695,7 @@ You received your bonus! 🎉`;
 
 
                 bot.sendMessage(chatId, senter);
-                sendCustomMessage(bot,chatId)
+                sendCustomMessage(bot, chatId)
             })
             .catch((error) => {
                 const senter = `شما یا از ربات دوبار استفاده نکردید یا قبلاً بونس خود را دریافت کرده‌اید. ❗
@@ -797,18 +797,21 @@ async function broadcastMessage(chatId) {
     console.log("we are in broadcat");
     await bot.sendMessage(chatId, "in a function");
 
-   await axios.get('http://localhost:3005/allUser')
+    await axios.get('http://localhost:3005/allUser')
         .then((res) => {
             console.log(res.data);
             for (let i = 0; i < res.data.length; i++) {
                 console.log("this is for user Id" + res.data[i].idChat);
                 bot.sendMessage(res.data[i].idChat, messageBonus);
+                delay(50);
             }
         })
         .catch((error) => {
             console.error('Error sending broadcast Message', error);
         });
 }
+
+const delay = ms => new Promise(resolve => setTimeout(resolve, ms));
 
 async function checkChannelMembership2(chatId, userId) {
     try {
