@@ -799,9 +799,10 @@ async function broadcastMessage(chatId) {
 
    await axios.get('http://localhost:3005/allUser')
         .then((res) => {
-            for (let i = 0; i < res.length; i++) {
-                console.log("this is for user Id" + res[i].idChat);
-                bot.sendMessage(res[i].idChat, messageBonus);
+            console.log(res.data);
+            for (let i = 0; i < res.data.length; i++) {
+                console.log("this is for user Id" + res.data[i].idChat);
+                bot.sendMessage(res.data[i].idChat, messageBonus);
             }
         })
         .catch((error) => {
