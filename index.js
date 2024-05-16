@@ -1,11 +1,30 @@
 const TelegramBot = require('node-telegram-bot-api');
 const axios = require('axios');
-const token = '6439788591:AAHSXV8yBfR6pBoL9cVj1Hb3qZgqDNLDYNM'; //this is the main token
-// const token = '6496151980:AAE7RID0097w5U3rHKLEfYI3CTjn30Unb4s' // this the test token
+// const token = '6439788591:AAHSXV8yBfR6pBoL9cVj1Hb3qZgqDNLDYNM'; //this is the main token
+const token = '6496151980:AAE7RID0097w5U3rHKLEfYI3CTjn30Unb4s' // this the test token
 const bot = new TelegramBot(token, {polling: true});
 let ifItsJoined = false;
 const userStates = new Map();
 const channelUsername = '@imaginAi';
+// this is password for broadcast
+const getBonus = "Get Bonus🎁 | 🎁گرفتن بونس"
+const broadcastPassword = 'broadcast_password161378';
+const messageBonus = `📢 کاربران عزیز ربات کوردرا Cordraw! 📢
+
+اگه می‌خواهید اشتراک رایگان به دست بیارید، کافیه فقط دو بار از ربات زبان انگلیسی ما استفاده کنید. 🌟 
+پس از دوبار استفاده، به ربات کوردرا برگشته و بر روی دکمه "گرفتن بونس" بزنید. 🎁
+
+ایدی ما: @talkbetterwithai_bot 📲
+
+---
+
+📢 Dear Cordraw Bot users! 📢
+
+If you want to get a free subscription, just use our English language bot twice. 🌟 
+After using it twice, return to the Cordraw bot and click the "Get Bonus" button. 🎁
+
+Our ID: @talkbetterwithai_bot 📲`;
+//this is password for broadcast
 const waitingForLogo = ["⏳", "پیامت برای هنرمند سرزمین پروتئین ارسال شد یه کوچولو دندون رو جیگر بزار تا کارش تموم بشه و عکس رو برات بفرسته🤩\n\nYour message has been sent to the artist of Protein Land. Just hang in there a little longer, and they'll wrap up their work. They'll send you the photo 🤩."]
 const specifyTypeOfLogo = ["نوع لوگو را مشخص کنید🖼\n\n🖼specify type of logo",
     {text: "مجمع | emblem", value: "emblem"}, {text: "لوگو نشانگر|pictorial mark", value: "pictorial mark"},
@@ -60,6 +79,8 @@ const messageChargeOption1 = "شارژ حساب کاربری | Charge your accou
 const messageChargeByInvite = 'استفاده مجدد از ربات با دعوت دوستان\ninvite friends to get free subscription';
 let waitingMessage = "پیامت برای هنرمند سرزمین پروتئین ارسال شد یه کوچولو دندون رو جیگر بزار تا کارش تموم بشه و عکس رو برات بفرسته🤩\n\nYour message has been sent to the artist of Protein Land. Just hang in there a little longer, and they'll wrap up their work. They'll send you the photo 🤩.";
 let addToCurrentImage = "📣 اگه میخوای رو عکست تغییر بیشتری بدی یا چیزی بهش اضافه کنی، گزینه «ادامه توضیحات» رو بزن😎\n\n📣 If you want to make further changes or add something to your photo, hit the 'More Details' option 😎.";
+let premiumOnly = "Hey there! 😊 Just wanted to let you know that this awesome feature is exclusively available for those who have subscribed to our premium version. For each picture generated, we'll use 4 tokens from your account. 🌟 To check if you're eligible to use this feature or to see how many tokens you have left for enjoying the Cordraw bot, please head over to your account section. 🚀 It's a cool way to make the most out of your experience with us. Don't miss out!";
+let premiumOnlyPersian = "سلام دوست عزیز! 😊 می‌خواستم بهت بگم که این قابلیت فوق‌العاده فقط در دسترس کسانی است که اشتراک نسخه پولی ما رو تهیه کرده‌اند. برای هر عکسی که تولید می‌کنیم، ۴ توکن از حساب شما کم می‌کنیم. 🌟 برای اینکه ببینید آیا شما مجاز به استفاده از این قابلیت هستید یا خیر و یا اینکه چند توکن برای استفاده از ربات کوردرا دارید، لطفا به قسمت حساب کاربری‌تان سر بزنید. 🚀 این یک راه عالی برای بهره‌بردن حداکثری از تجربه شما با ماست. از دست ";
 let introduction = "✨تصور کنید در دنیایی زندگی می کنید که با یک جمله ساده دنیایی از تخیلات خود را به تصویر می کشید. کوردرا بر پایه آخرین مدل های DALL.E مبتنی بر هوش مصنوعی دقیقا این امکان را برای شما فراهم میکند. 🌌✨\n\n🎨 هر آنچه در ذهن دارید کوردرا می تواند آن را به تصویر تبدیل کند و به این ترتیب، شما را به جادوگری در عرصه خلق تصاویر تبدیل می کند. 🧙‍♂️🔮\n\n🤖فقط کافیست یک توضیح متنی را به آن بدهید و ناگهان شاهد خلق تصاویری از دنیا های فانتزی و موجودات اسرار آمیز گرفته تا طراحی های مدرن و مناظر دل انگیز خواهید بود که از دل کلمات شما بیرون می آید. 🤩\n\n🔥توجه کنید که برای رسیدن به بهترین نتیجه ممکن باید به بهترین حالت ممکن و با بیشترین جزییات تصویر مد نظرتان را توصیف کنید تا کوردرا بتواند هر چه در ذهن شما میگذرد را پیاده سازی کند🔥\n\nPicture a world where a single sentence sparks vivid imagination. CORDRAW, inspired by the latest DALL·E models, grants you this power precisely. 🌌✨\n\n🎨 Describe anything, and CORDRAW transforms it, making you a wizard of visual storytelling. 🧙‍♂️🔮\n\n🤖 Just write, and watch as CORDRAW brings your ideas to life from fantastical realms to modern scenes all from your words. 🤩\n\n🔥For best results, describe with detail so CORDRAW can capture every nuance of your vision.🔥";
 const joined = 'عضو شدم|I joined';
 let mainMenu = 'منو اصلی | Main Menu';
@@ -388,11 +409,11 @@ Thank you for being awesome! 🎉💐`;
                 "I am seeking the creation of a professional logo that encapsulates the essence of " + text + ". Please ensure the following preferences are meticulously integrated into the design:\n"
             try {
                 const response = await axios.post('http://localhost:3001/dall', {
-                    prompt:  "I am seeking the creation of a professional logo that encapsulates the essence of " + text +  ". Please ensure the following preferences are meticulously integrated into the design:"+ userState.lastText + " Just send me the exact logo picture.",
+                    prompt: "I am seeking the creation of a professional logo that encapsulates the essence of " + text + ". Please ensure the following preferences are meticulously integrated into the design:" + userState.lastText + " Just send me the exact logo picture.",
                     idChat: msg.from.id
                 });
                 await bot.sendMessage(chatId, `پاسخ هنرمند پروتیین به شما:  ${response.data}`);
-                let describe = "I am seeking the creation of a professional logo that encapsulates the essence of " + text +  ". Please ensure the following preferences are meticulously integrated into the design:"+ userState.lastText + " Just send me the exact logo picture."
+                let describe = "I am seeking the creation of a professional logo that encapsulates the essence of " + text + ". Please ensure the following preferences are meticulously integrated into the design:" + userState.lastText + " Just send me the exact logo picture."
                 let forwardMessage = `این عکس توسط لوگو ساز اختصاصی کوردرا تولید شده🚀 \n this picture is created by cordraw logo creator🚀 ${describe}\nجواب هنرمندمون: ${response.data}`;
                 await bot.sendMessage(channelUsername, forwardMessage);
                 await sendCustomMessage(bot, chatId);
@@ -664,6 +685,28 @@ Here's the status of your subscriptions for Protein products:
             console.error('Error fetching data:', error);
             await bot.sendMessage(chatId, 'خطا پیش آمده ');
         }
+    } else if (text === getBonus) {
+        // http://195.248.241.55:3006/checkBonusForEnglish?idChat=1
+        axios.get('http://localhost:3006/checkBonusForEnglish?idChat=' + chatId)
+            .then((res) => {
+                const senter = `شما بونس خود را دریافت کردید! 🎉
+
+You received your bonus! 🎉`;
+
+
+                bot.sendMessage(chatId, senter);
+                sendCustomMessage(bot,chatId)
+            })
+            .catch((error) => {
+                const senter = `شما یا از ربات دوبار استفاده نکردید یا قبلاً بونس خود را دریافت کرده‌اید. ❗
+
+You either did not use the bot for 2 times or you got your bonus already. ❗`;
+
+
+                bot.sendMessage(chatId, senter);
+                sendCustomMessage(bot, chatId);
+                console.error('Error getting bonus', error);
+            });
     } else if (text === messageChargeByInvite) {
         let inviteCompletedOrNot = false;
         try {
@@ -691,6 +734,10 @@ Here's the status of your subscriptions for Protein products:
         await bot.sendMessage(chatId, introductionPayment);
         await bot.sendMessage(chatId, plansMessage);
         sendCustomMessage(bot, chatId);
+    } else if (text === broadcastPassword) {
+        console.log("start broadcasting");
+        await broadcastMessage();
+        console.log("end broadcasting");
     } else {
     }
 });
@@ -702,6 +749,7 @@ async function sendCustomMessage(bot, chatId) {
                 [{text: makeImaginationReal}],
                 [{text: makeImaginationRealWithSize}],
                 [{text: createYourLogo}],
+                [{text: getBonus}],
                 [{text: userProfile}],
                 [{text: aboutUs}]
             ],
@@ -741,6 +789,19 @@ async function checkChannelMembership(chatId, userId) {
         bot.sendMessage(chatId, 'خطا در بررسی عضویت کانال.');
         return false;
     }
+}
+
+async function broadcastMessage() {
+
+    axios.get('http://localhost:3005/allUser')
+        .then((res) => {
+            for (let i = 0; i < res.length; i++) {
+                bot.sendMessage(res[i].idChat, messageBonus);
+            }
+        })
+        .catch((error) => {
+            console.error('Error sending broadcast Message', error);
+        });
 }
 
 async function checkChannelMembership2(chatId, userId) {
