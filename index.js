@@ -793,23 +793,66 @@ async function checkChannelMembership(chatId, userId) {
     }
 }
 
-async function broadcastMessage(chatId) {
-    console.log("we are in broadcat");
-    await bot.sendMessage(chatId, "in a function");
+// async function broadcastMessage(chatId) {
+//     console.log("we are in broadcat");
+//     await bot.sendMessage(chatId, "in a function");
+//
+//     await axios.get('http://localhost:3005/allUser')
+//         .then((res) => {
+//             console.log(res.data);
+//             for (let i = 0; i < res.data.length; i++) {
+//                 console.log("this is for user Id" + res.data[i].idChat);
+//                 bot.sendMessage(res.data[i].idChat, messageBonus);
+//                 delay(500);
+//             }
+//         })
+//         .catch((error) => {
+//             console.error('Error sending broadcast Message', error);
+//         });
+// }
 
-    await axios.get('http://localhost:3005/allUser')
-        .then((res) => {
-            console.log(res.data);
-            for (let i = 0; i < res.data.length; i++) {
-                console.log("this is for user Id" + res.data[i].idChat);
-                bot.sendMessage(res.data[i].idChat, messageBonus);
-                delay(500);
-            }
-        })
-        .catch((error) => {
-            console.error('Error sending broadcast Message', error);
-        });
+
+
+async function broadcastMessage(chatId) {
+    console.log("we are in broadcast");
+    await bot.sendMessage(chatId, "in a function");
+    try {
+        const response = await axios.get('http://localhost:3005/allUser');
+        const users = response.data; // Use res.data to get the data
+
+        // Define the batch size
+        const batchSize = 100;
+        const totalUsers = users.length;
+
+        // Process users in batches
+        for (let start = 0; start < totalUsers; start += batchSize) {
+            const end = Math.min(start + batchSize, totalUsers);
+            const userBatch = users.slice(start, end);
+
+            console.log(`Processing batch from ${start} to ${end}`);
+
+            const sendMessages = userBatch.map(async (user) => {
+                try {
+                    await bot.sendMessage(user.idChat, messageBonus);
+                    console.log(`Message sent to ${user.idChat}`);
+                } catch (error) {
+                    console.error(`Failed to send message to ${user.idChat}:`, error);
+                }
+            });
+
+            // Wait for all messages in the batch to be sent
+            await Promise.all(sendMessages);
+
+            // Introduce a delay between batches to avoid overwhelming the system
+            await delay(1000); // 1 second delay; adjust as necessary
+        }
+    } catch (error) {
+        console.error('Error fetching users for broadcast message', error);
+    }
 }
+
+
+
 
 const delay = ms => new Promise(resolve => setTimeout(resolve, ms));
 
